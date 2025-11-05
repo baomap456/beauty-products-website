@@ -1,0 +1,120 @@
+const express = require('express');
+const router = express.Router();
+const productController = require('../../controllers/product.controller');
+const { verifyToken } = require('../../utils/jwt');
+
+/**
+ * @openapi
+ * /api/user/products:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm (user)
+ *     tags:
+ *       - Products (User)
+ *     responses:
+ *       200:
+ *         description: Danh sách sản phẩm
+ */
+router.get('/products', productController.getAllProducts);
+
+/**
+ * @openapi
+ * /api/user/products/{id}:
+ *   get:
+ *     summary: Lấy sản phẩm theo id (user)
+ *     tags:
+ *       - Products (User)
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Thông tin sản phẩm
+ *       404:
+ *         description: Không tìm thấy sản phẩm
+ */
+router.get('/products/:id', productController.getProductById);
+
+/**
+ * @openapi
+ * /api/user/products/paginated:
+ *   get:
+ *     summary: Lấy sản phẩm phân trang (user)
+ *     tags:
+ *       - Products (User)
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Danh sách phân trang
+ */
+router.get('/products/paginated', productController.getPaginatedProduct);
+
+/**
+ * @openapi
+ * /api/user/products/search:
+ *   get:
+ *     summary: Tìm kiếm sản phẩm (user)
+ *     tags:
+ *       - Products (User)
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Kết quả tìm kiếm
+ */
+router.get('/products/search', productController.searchProduct);
+
+/**
+ * @openapi
+ * /api/user/products/filter:
+ *   post:
+ *     summary: Lọc sản phẩm (user)
+ *     tags:
+ *       - Products (User)
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Danh sách đã lọc
+ */
+router.post('/products/filter', productController.filterProducts);
+
+/**
+ * @openapi
+ * /api/user/products/sort:
+ *   get:
+ *     summary: Sắp xếp sản phẩm (user)
+ *     tags:
+ *       - Products (User)
+ *     parameters:
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Danh sách đã sắp xếp
+ */
+router.get('/products/sort', productController.sortProducts);
+
+module.exports = router;

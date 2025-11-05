@@ -37,12 +37,12 @@ async function login(Email, Password) {
 
     const user = await User.findOne({ where: { Email } });
     if (!user) {
-        throw new Error('Email không đúng');
+        throw new Error('Thông tin đăng nhập không chính xác');
     }
 
     const isPasswordValid = await bcrypt.compare(Password, user.Password);
     if (!isPasswordValid) {
-        throw new Error('Mật khẩu không đúng');
+        throw new Error('Thông tin đăng nhập không chính xác');
     }
 
     // Lấy ID_User đúng
@@ -73,6 +73,7 @@ async function login(Email, Password) {
 
 async function getUserProfile(userId) {
     const user = await User.findByPk(userId, {
+        include: [{ model: Role, attributes: ['Name'] }],
         attributes: { exclude: ['Password'] }
     });
 

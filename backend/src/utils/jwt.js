@@ -34,4 +34,23 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-module.exports = { signToken, verifyToken };
+const isAdmin = async (req, res, next) => {
+    try {
+        if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
+
+        const user = await User.findByPk(req.user.id, { include: Role });
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Kiểm tra vai trò
+        if (user.Role && user.Role.Name_Role === 'Admin') {
+            return next();
+        } else {
+            return res.status(403).json({ message: 'Access denied: Admins only' });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Authorization error' });
+    }
+};
+
+module.exports = { signToken, verifyToken, isAdmin };

@@ -3,6 +3,9 @@ const authService = require('../services/auth.service');
 const register = async (req, res) => {
     try {
         const userData = req.body;
+        if (!userData.Email || !userData.Password) {
+            return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
+        }
         const newUser = await authService.register(userData);
 
         res.status(201).json({

@@ -68,4 +68,19 @@ router.post('/login', authController.login);
  */
 router.get('/profile', verifyToken, authController.getProfile);
 
+// mount user and admin routers (user routes under /api/user, admin under /api/admin)
+try {
+    const userRouter = require('./user');
+    router.use('/user', userRouter);
+} catch (err) {
+    console.warn('Không thể load user router:', err.message);
+}
+
+try {
+    const adminRouter = require('./admin');
+    router.use('/admin', adminRouter);
+} catch (err) {
+    console.warn('Không thể load admin router:', err.message);
+}
+
 module.exports = router;

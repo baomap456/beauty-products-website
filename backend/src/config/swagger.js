@@ -1,27 +1,36 @@
-const swaggerJsdoc = require('swagger-jsdoc');
+const path = require('path');
 const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+
+const swaggerPath = '/api-docs';
+
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Beauty Products API',
+            version: '1.0.0',
+            description: 'API documentation for Beauty Products website'
+        },
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                }
+            }
+        },
+        security: [{ bearerAuth: [] }]
+    },
+    // quét tất cả file trong routers và các thư mục con
+    apis: [path.join(__dirname, '..', 'routers', '**', '*.js')]
+};
+
+const swaggerSpec = swaggerJsdoc(options);
 
 function setupSwagger(app) {
-    const options = {
-        definition: {
-            openapi: '3.0.0',
-            info: {
-                title: 'Beauty Products API',
-                version: '1.0.0',
-                description: 'API documentation for Beauty Products website',
-            },
-            servers: [
-                {
-                    url: 'http://localhost:3000/api',
-                    description: 'Development server',
-                },
-            ],
-        },
-        apis: ['./src/routers/*.js'], // nơi chứa các route có swagger annotation
-    };
-
-    const specs = swaggerJsdoc(options);
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+    app.use(swaggerPath, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
 
-module.exports = { setupSwagger };
+module.exports = { setupSwagger, swaggerPath };
