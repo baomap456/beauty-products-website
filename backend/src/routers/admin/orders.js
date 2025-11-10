@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ctrl = require('../../controllers/admin/order.controller');
+const ctrl = require('../../controllers/order.controller');
 const { verifyToken, isAdmin } = require('../../utils/jwt');
 
 /**
@@ -175,7 +175,7 @@ router.get('/', verifyToken, isAdmin, ctrl.listOrders);
  *       500:
  *         description: Server error
  */
-router.get('/:id', verifyToken, isAdmin, ctrl.getOrder);
+router.get('/:id', verifyToken, isAdmin, ctrl.getOrderByAdmin);
 
 /**
  * @openapi
@@ -259,7 +259,7 @@ router.get('/:id', verifyToken, isAdmin, ctrl.getOrder);
  *       500:
  *         description: Server error
  */
-router.put('/:id/status', verifyToken, isAdmin, ctrl.updateOrderStatus);
+router.put('/:id/status', verifyToken, isAdmin, ctrl.updateOrderStatusByAdmin);
 
 /**
  * @openapi
@@ -331,6 +331,6 @@ router.put('/:id/status', verifyToken, isAdmin, ctrl.updateOrderStatus);
  *       500:
  *         description: Server error
  */
-router.post('/:id/cancel', verifyToken, isAdmin, ctrl.cancelOrder);
+router.post('/:id/cancel', verifyToken, isAdmin, ctrl.cancelOrderByAdmin);
 
 module.exports = router;

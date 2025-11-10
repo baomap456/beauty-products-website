@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const ctrl = require('../controllers/payment.controller');
-const { verifyToken } = require('../utils/jwt');
+const ctrl = require('../../controllers/payment.controller');
+const { verifyToken } = require('../../utils/jwt');
 
 /**
  * @openapi
