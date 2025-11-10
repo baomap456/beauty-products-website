@@ -9,6 +9,7 @@ try {
     const productImagesRouter = require('./productimages');
     const cartRouter = require('./cart');
     const ordersRouter = require('./orders');
+    const paymentsRouter = require('./payments'); // thêm payments router
 
     router.use('/', productsRouter); // maps to /api/user/products...
     router.use('/', categoriesRouter); // maps to /api/user/categories...
@@ -20,6 +21,9 @@ try {
 
     // orders endpoints -> /api/user/orders
     router.use('/orders', ordersRouter);
+
+    // payments endpoints -> /api/user/payments
+    router.use('/payments', paymentsRouter);
 } catch (err) {
     console.warn('Không thể load user subrouters:', err.message);
 }
