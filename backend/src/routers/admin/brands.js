@@ -18,9 +18,15 @@ const { verifyToken, isAdmin } = require('../../utils/jwt');
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - Name_Brand
  *             properties:
- *               name:
+ *               Name_Brand:
  *                 type: string
+ *                 example: "Thương hiệu A"
+ *               Description:
+ *                 type: string
+ *                 example: "Mô tả thương hiệu"
  *     responses:
  *       201:
  *         description: Thương hiệu được tạo
@@ -56,7 +62,7 @@ router.get('/brands', verifyToken, isAdmin, brandController.getAllBrands);
  *         in: path
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Thương hiệu
@@ -78,11 +84,20 @@ router.get('/brands/:id', verifyToken, isAdmin, brandController.getBrandById);
  *       - name: id
  *         in: path
  *         required: true
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               Name_Brand:
+ *                 type: string
+ *                 example: "Tên mới"
+ *               Description:
+ *                 type: string
+ *                 example: "Mô tả mới"
  *     responses:
  *       200:
  *         description: Đã cập nhật
@@ -102,6 +117,8 @@ router.put('/brands/:id', verifyToken, isAdmin, brandController.updateBrand);
  *       - name: id
  *         in: path
  *         required: true
+ *         schema:
+ *           type: integer
  *     responses:
  *       204:
  *         description: Đã xóa

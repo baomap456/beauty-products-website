@@ -1,15 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../../controllers/product.controller');
-const { verifyToken } = require('../../utils/jwt');
 
 /**
  * @openapi
  * /api/user/products:
  *   get:
- *     summary: Lấy danh sách sản phẩm (user)
+ *     summary: Lấy danh sách sản phẩm (public)
  *     tags:
- *       - Products (User)
+ *       - Products (Public)
  *     responses:
  *       200:
  *         description: Danh sách sản phẩm
@@ -20,9 +19,9 @@ router.get('/products', productController.getAllProducts);
  * @openapi
  * /api/user/products/{id}:
  *   get:
- *     summary: Lấy sản phẩm theo id (user)
+ *     summary: Lấy sản phẩm theo id (public)
  *     tags:
- *       - Products (User)
+ *       - Products (Public)
  *     parameters:
  *       - name: id
  *         in: path
@@ -41,9 +40,9 @@ router.get('/products/:id', productController.getProductById);
  * @openapi
  * /api/user/products/paginated:
  *   get:
- *     summary: Lấy sản phẩm phân trang (user)
+ *     summary: Lấy sản phẩm phân trang (public)
  *     tags:
- *       - Products (User)
+ *       - Products (Public)
  *     parameters:
  *       - in: query
  *         name: page
@@ -57,15 +56,15 @@ router.get('/products/:id', productController.getProductById);
  *       200:
  *         description: Danh sách phân trang
  */
-router.get('/products/paginated', productController.getPaginatedProduct);
+router.get('/products/paginated', productController.getPaginatedProducts);
 
 /**
  * @openapi
  * /api/user/products/search:
  *   get:
- *     summary: Tìm kiếm sản phẩm (user)
+ *     summary: Tìm kiếm sản phẩm (public)
  *     tags:
- *       - Products (User)
+ *       - Products (Public)
  *     parameters:
  *       - in: query
  *         name: query
@@ -81,9 +80,9 @@ router.get('/products/search', productController.searchProduct);
  * @openapi
  * /api/user/products/filter:
  *   post:
- *     summary: Lọc sản phẩm (user)
+ *     summary: Lọc sản phẩm (public)
  *     tags:
- *       - Products (User)
+ *       - Products (Public)
  *     requestBody:
  *       content:
  *         application/json:
@@ -99,9 +98,9 @@ router.post('/products/filter', productController.filterProducts);
  * @openapi
  * /api/user/products/sort:
  *   get:
- *     summary: Sắp xếp sản phẩm (user)
+ *     summary: Sắp xếp sản phẩm (public)
  *     tags:
- *       - Products (User)
+ *       - Products (Public)
  *     parameters:
  *       - in: query
  *         name: sortBy

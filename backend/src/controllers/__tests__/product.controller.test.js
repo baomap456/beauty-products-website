@@ -11,6 +11,10 @@ jest.mock('../../services/product.service', () => ({
     sortProducts: jest.fn(),
 }));
 
+// silence noisy error logs from controllers during tests
+beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => { }));
+afterAll(() => console.error.mockRestore && console.error.mockRestore());
+
 const productService = require('../../services/product.service');
 const controller = require('../product.controller');
 

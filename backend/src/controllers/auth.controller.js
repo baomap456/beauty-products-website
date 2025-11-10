@@ -21,13 +21,13 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { Email, Password } = req.body;
 
-        if (!email || !password) {
+        if (!Email || !Password) {
             return res.status(400).json({ message: 'Vui lòng nhập email và mật khẩu' });
         }
 
-        const result = await authService.login(email, password);
+        const result = await authService.login(Email, Password);
 
         res.status(200).json({
             message: 'Đăng nhập thành công!',

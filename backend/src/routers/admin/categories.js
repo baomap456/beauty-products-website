@@ -18,9 +18,15 @@ const { verifyToken, isAdmin } = require('../../utils/jwt');
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - Name_Category
  *             properties:
- *               name:
+ *               Name_Category:
  *                 type: string
+ *                 example: "Chăm sóc da"
+ *               Description:
+ *                 type: string
+ *                 example: "Mô tả danh mục"
  *     responses:
  *       201:
  *         description: Danh mục được tạo
@@ -56,7 +62,7 @@ router.get('/categories', verifyToken, isAdmin, categoryController.getAllCategor
  *         in: path
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Danh mục
@@ -78,11 +84,20 @@ router.get('/categories/:id', verifyToken, isAdmin, categoryController.getCatego
  *       - name: id
  *         in: path
  *         required: true
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               Name_Category:
+ *                 type: string
+ *                 example: "Tên mới"
+ *               Description:
+ *                 type: string
+ *                 example: "Mô tả mới"
  *     responses:
  *       200:
  *         description: Đã cập nhật
@@ -102,6 +117,8 @@ router.put('/categories/:id', verifyToken, isAdmin, categoryController.updateCat
  *       - name: id
  *         in: path
  *         required: true
+ *         schema:
+ *           type: integer
  *     responses:
  *       204:
  *         description: Đã xóa

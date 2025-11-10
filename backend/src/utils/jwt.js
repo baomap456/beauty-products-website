@@ -34,23 +34,25 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-const isAdmin = async (req, res, next) => {
+function isAdmin(req, res, next) {
     try {
-        if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
-
-        const user = await User.findByPk(req.user.id, { include: Role });
-        if (!user) return res.status(404).json({ message: 'User not found' });
-
-        // Kiểm tra vai trò
-        if (user.Role && user.Role.Name_Role === 'Admin') {
-            return next();
-        } else {
-            return res.status(403).json({ message: 'Access denied: Admins only' });
+        // lấy user từ middleware verifyToken (phải có req.user)
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({ message: 'Unauthorized' });
         }
+
+        // chấp nhận các tên trường role khác nhau
+        const role = user.role ?? user.Role_ID ?? user.RoleId ?? user.role_id;
+        if (role === 'admin' || Number(role) === 1) {
+            return next();
+        }
+
+        return res.status(403).json({ message: 'Forbidden' });
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Authorization error' });
+        console.error('isAdmin middleware error:', err);
+        return res.status(500).json({ message: 'Internal server error' });
     }
-};
+}
 
 module.exports = { signToken, verifyToken, isAdmin };

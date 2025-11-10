@@ -3,8 +3,6 @@ const router = express.Router();
 const productController = require('../../controllers/product.controller');
 const { verifyToken, isAdmin } = require('../../utils/jwt');
 
-// Admin routes for products (use middleware, do NOT call controller functions here)
-
 /**
  * @openapi
  * /api/admin/products:
@@ -20,6 +18,29 @@ const { verifyToken, isAdmin } = require('../../utils/jwt');
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - Name_Product
+ *               - Price
+ *             properties:
+ *               Name_Product:
+ *                 type: string
+ *                 example: "Kem dưỡng da ban đêm"
+ *               Price:
+ *                 type: number
+ *                 format: float
+ *                 example: 199000.00
+ *               Stock:
+ *                 type: integer
+ *                 example: 50
+ *               Description:
+ *                 type: string
+ *                 example: "Kem dưỡng ẩm, phục hồi da"
+ *               Category_ID:
+ *                 type: integer
+ *                 example: 2
+ *               Brand_ID:
+ *                 type: integer
+ *                 example: 3
  *     responses:
  *       201:
  *         description: Sản phẩm được tạo
@@ -33,19 +54,8 @@ router.post('/products', verifyToken, isAdmin, productController.createProduct);
  *     summary: Lấy danh sách sản phẩm (admin)
  *     tags:
  *       - Products (Admin)
- *     responses:
- *       200:
- *         description: Danh sách sản phẩm
- */
-router.get('/products', verifyToken, isAdmin, productController.getAllProducts);
-
-/**
- * @openapi
- * /api/admin/products/paginated:
- *   get:
- *     summary: Lấy sản phẩm phân trang (admin)
- *     tags:
- *       - Products (Admin)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -57,69 +67,9 @@ router.get('/products', verifyToken, isAdmin, productController.getAllProducts);
  *           type: integer
  *     responses:
  *       200:
- *         description: Danh sách phân trang
+ *         description: Danh sách sản phẩm
  */
-router.get('/products/paginated', verifyToken, isAdmin, productController.getPaginatedProducts);
-
-/**
- * @openapi
- * /api/admin/products/search:
- *   get:
- *     summary: Tìm kiếm sản phẩm (admin)
- *     tags:
- *       - Products (Admin)
- *     parameters:
- *       - in: query
- *         name: query
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Kết quả tìm kiếm
- */
-router.get('/products/search', verifyToken, isAdmin, productController.searchProduct);
-
-/**
- * @openapi
- * /api/admin/products/filter:
- *   post:
- *     summary: Lọc sản phẩm (admin)
- *     tags:
- *       - Products (Admin)
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       200:
- *         description: Danh sách đã lọc
- */
-router.post('/products/filter', verifyToken, isAdmin, productController.filterProducts);
-
-/**
- * @openapi
- * /api/admin/products/sort:
- *   get:
- *     summary: Sắp xếp sản phẩm (admin)
- *     tags:
- *       - Products (Admin)
- *     parameters:
- *       - in: query
- *         name: sortBy
- *         schema:
- *           type: string
- *       - in: query
- *         name: order
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Danh sách đã sắp xếp
- */
-router.get('/products/sort', verifyToken, isAdmin, productController.sortProducts);
+router.get('/products', verifyToken, isAdmin, productController.getAllProducts);
 
 /**
  * @openapi
@@ -128,12 +78,14 @@ router.get('/products/sort', verifyToken, isAdmin, productController.sortProduct
  *     summary: Lấy sản phẩm theo id (admin)
  *     tags:
  *       - Products (Admin)
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Thông tin sản phẩm
@@ -155,11 +107,33 @@ router.get('/products/:id', verifyToken, isAdmin, productController.getProductBy
  *       - name: id
  *         in: path
  *         required: true
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               Name_Product:
+ *                 type: string
+ *                 example: "Kem dưỡng mới"
+ *               Price:
+ *                 type: number
+ *                 format: float
+ *                 example: 210000.00
+ *               Stock:
+ *                 type: integer
+ *                 example: 30
+ *               Description:
+ *                 type: string
+ *                 example: "Mô tả cập nhật"
+ *               Category_ID:
+ *                 type: integer
+ *                 example: 2
+ *               Brand_ID:
+ *                 type: integer
+ *                 example: 3
  *     responses:
  *       200:
  *         description: Sản phẩm được cập nhật
@@ -179,10 +153,20 @@ router.put('/products/:id', verifyToken, isAdmin, productController.updateProduc
  *       - name: id
  *         in: path
  *         required: true
+ *         schema:
+ *           type: integer
  *     responses:
  *       204:
  *         description: Đã xóa
  */
 router.delete('/products/:id', verifyToken, isAdmin, productController.deleteProduct);
+
+/**
+ * Other product admin endpoints (search, filter, sort, paginated) remain unchanged
+ */
+router.get('/products/paginated', verifyToken, isAdmin, productController.getPaginatedProducts);
+router.get('/products/search', verifyToken, isAdmin, productController.searchProduct);
+router.post('/products/filter', verifyToken, isAdmin, productController.filterProducts);
+router.get('/products/sort', verifyToken, isAdmin, productController.sortProducts);
 
 module.exports = router;

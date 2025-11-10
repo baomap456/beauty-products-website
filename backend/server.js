@@ -1,5 +1,6 @@
 require('dotenv').config();
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 
@@ -30,7 +31,14 @@ try {
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+// tăng giới hạn payload để có thể upload metadata lớn nếu cần
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// ensure uploads folder exists and serve it statically at /uploads
+const uploadsDir = path.join(__dirname, 'uploads');
+fs.mkdirSync(uploadsDir, { recursive: true });
+app.use('/uploads', express.static(uploadsDir));
 
 // đảm bảo routes là middleware/Router hợp lệ trước khi mount
 if (typeof routes === 'function' || (routes && typeof routes.use === 'function')) {
@@ -70,3 +78,5 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
+

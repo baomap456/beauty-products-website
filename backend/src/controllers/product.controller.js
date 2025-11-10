@@ -2,8 +2,13 @@ const productService = require('../services/product.service');
 
 const handleError = (res, error, message = 'Internal server error') => {
     console.error(message, error);
-    res.status(500).json({ error: message });
+    return res.status(error?.status || 500).json({ error: message });
 };
+
+function validateRequired(body) {
+    if (!body || !body.name || body.price == null) return false;
+    return true;
+}
 
 const getAllProducts = async (req, res) => {
     try {
@@ -29,14 +34,19 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const productData = req.body;
-        if (!productData.name || !productData.price) {
+        if (!validateRequired(req.body))
             return res.status(400).json({ error: 'Missing required fields' });
+
+        // safety: ensure service function exists
+        if (typeof productService.createProduct !== 'function') {
+            console.error('productService.createProduct is not a function', productService);
+            return res.status(500).json({ error: 'Product service not available' });
         }
-        const newProduct = await productService.createProduct(productData);
-        res.status(201).json(newProduct);
+
+        const created = await productService.createProduct(req.body);
+        return res.status(201).json(created);
     } catch (error) {
-        handleError(res, error, 'Error creating product');
+        return handleError(res, error, 'Error creating product');
     }
 };
 

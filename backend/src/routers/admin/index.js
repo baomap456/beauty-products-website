@@ -2,8 +2,17 @@ const express = require('express');
 const router = express.Router();
 
 try {
-    const adminProducts = require('./products');
-    router.use('/', adminProducts); // maps to /api/admin/...
+    const productsRouter = require('./products');
+    const categoriesRouter = require('./categories');
+    const brandsRouter = require('./brands');
+    const productImagesRouter = require('./productimages');
+    const ordersRouter = require('./orders'); // admin orders routes
+
+    router.use('/products', productsRouter);
+    router.use('/categories', categoriesRouter);
+    router.use('/brands', brandsRouter);
+    router.use('/products', productImagesRouter); // if images router uses /products/:id/images
+    router.use('/orders', ordersRouter); // mount admin orders at /api/admin/orders
 } catch (err) {
     console.warn('Không thể load admin subrouters:', err.message);
 }

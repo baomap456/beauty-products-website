@@ -4,7 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     const ProductImage = sequelize.define('ProductImage', {
         ID_Image: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         URL: { type: DataTypes.STRING(255), allowNull: false },
-        Product_ID: { type: DataTypes.INTEGER, allowNull: false }
+        Product_ID: { type: DataTypes.INTEGER, allowNull: false },
+        isPrimary: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false } // <-- added
     }, {
         tableName: 'ProductImages',
         timestamps: false
