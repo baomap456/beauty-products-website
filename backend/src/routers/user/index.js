@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-// thêm những router dành cho user ở đây
+function isValid(r) {
+    return r && (typeof r === 'function' || typeof r.use === 'function');
+}
+
 try {
     const productsRouter = require('./products');
     const categoriesRouter = require('./categories');
@@ -9,21 +12,21 @@ try {
     const productImagesRouter = require('./productimages');
     const cartRouter = require('./cart');
     const ordersRouter = require('./orders');
-    const paymentsRouter = require('./payments'); // thêm payments router
+    const paymentsRouter = require('./payments');
+    const addressesRouter = require('./addresses');
+    const reviewRouter = require('./reviews');
+    const favoritesRouter = require('./favorites'); // mới
 
-    router.use('/', productsRouter); // maps to /api/user/products...
-    router.use('/', categoriesRouter); // maps to /api/user/categories...
-    router.use('/', brandsRouter); // maps to /api/user/brands...
-    router.use('/', productImagesRouter); // maps to /api/user/products/:id/images
-
-    // cart endpoints -> /api/user/cart
-    router.use('/cart', cartRouter);
-
-    // orders endpoints -> /api/user/orders
-    router.use('/orders', ordersRouter);
-
-    // payments endpoints -> /api/user/payments
-    router.use('/payments', paymentsRouter);
+    if (isValid(productsRouter)) router.use('/products', productsRouter);
+    if (isValid(categoriesRouter)) router.use('/categories', categoriesRouter);
+    if (isValid(brandsRouter)) router.use('/brands', brandsRouter);
+    if (isValid(productImagesRouter)) router.use('/products', productImagesRouter); // nếu router này định nghĩa /:id/images
+    if (isValid(cartRouter)) router.use('/cart', cartRouter);
+    if (isValid(ordersRouter)) router.use('/orders', ordersRouter);
+    if (isValid(paymentsRouter)) router.use('/payments', paymentsRouter);
+    if (isValid(addressesRouter)) router.use('/addresses', addressesRouter);
+    if (isValid(reviewRouter)) router.use('/reviews', reviewRouter);
+    if (isValid(favoritesRouter)) router.use('/favorites', favoritesRouter);
 } catch (err) {
     console.warn('Không thể load user subrouters:', err.message);
 }
