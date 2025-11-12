@@ -16,6 +16,7 @@ try {
     const addressesRouter = require('./addresses');
     const reviewRouter = require('./reviews');
     const favoritesRouter = require('./favorites'); // mới
+    const discountsRouter = require('./discounts');
 
     if (isValid(productsRouter)) router.use('/products', productsRouter);
     if (isValid(categoriesRouter)) router.use('/categories', categoriesRouter);
@@ -27,6 +28,7 @@ try {
     if (isValid(addressesRouter)) router.use('/addresses', addressesRouter);
     if (isValid(reviewRouter)) router.use('/reviews', reviewRouter);
     if (isValid(favoritesRouter)) router.use('/favorites', favoritesRouter);
+    if (isValid(discountsRouter)) router.use('/discounts', discountsRouter);
 } catch (err) {
     console.warn('Không thể load user subrouters:', err.message);
 }
