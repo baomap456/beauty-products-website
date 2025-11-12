@@ -45,7 +45,7 @@ const { verifyToken, isAdmin } = require('../../utils/jwt');
  *       201:
  *         description: Sản phẩm được tạo
  */
-router.post('/products', verifyToken, isAdmin, productController.createProduct);
+router.post('/', verifyToken, isAdmin, productController.createProduct);
 
 /**
  * @openapi
@@ -69,7 +69,7 @@ router.post('/products', verifyToken, isAdmin, productController.createProduct);
  *       200:
  *         description: Danh sách sản phẩm
  */
-router.get('/products', verifyToken, isAdmin, productController.getAllProducts);
+router.get('/', verifyToken, isAdmin, productController.getAllProducts);
 
 /**
  * @openapi
@@ -92,7 +92,7 @@ router.get('/products', verifyToken, isAdmin, productController.getAllProducts);
  *       404:
  *         description: Không tìm thấy sản phẩm
  */
-router.get('/products/:id', verifyToken, isAdmin, productController.getProductById);
+router.get('/:id', verifyToken, isAdmin, productController.getProductById);
 
 /**
  * @openapi
@@ -138,7 +138,7 @@ router.get('/products/:id', verifyToken, isAdmin, productController.getProductBy
  *       200:
  *         description: Sản phẩm được cập nhật
  */
-router.put('/products/:id', verifyToken, isAdmin, productController.updateProduct);
+router.put('/:id', verifyToken, isAdmin, productController.updateProduct);
 
 /**
  * @openapi
@@ -159,14 +159,108 @@ router.put('/products/:id', verifyToken, isAdmin, productController.updateProduc
  *       204:
  *         description: Đã xóa
  */
-router.delete('/products/:id', verifyToken, isAdmin, productController.deleteProduct);
+router.delete('/:id', verifyToken, isAdmin, productController.deleteProduct);
 
 /**
- * Other product admin endpoints (search, filter, sort, paginated) remain unchanged
+ * @openapi
+ * /api/admin/products/paginated:
+ *   get:
+ *     summary: Phân trang sản phẩm (admin)
+ *     tags: [Products (Admin)]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, minimum: 1, example: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, minimum: 1, maximum: 200, example: 10 }
+ *     responses:
+ *       200:
+ *         description: Danh sách sản phẩm theo trang
  */
-router.get('/products/paginated', verifyToken, isAdmin, productController.getPaginatedProducts);
-router.get('/products/search', verifyToken, isAdmin, productController.searchProduct);
-router.post('/products/filter', verifyToken, isAdmin, productController.filterProducts);
-router.get('/products/sort', verifyToken, isAdmin, productController.sortProducts);
+router.get('/paginated', verifyToken, isAdmin, productController.getPaginatedProducts);
+
+/**
+ * @openapi
+ * /api/admin/products/search:
+ *   get:
+ *     summary: Tìm kiếm sản phẩm (admin)
+ *     tags: [Products (Admin)]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         description: Từ khóa tìm kiếm
+ *         required: true
+ *         schema: { type: string, example: "kem dưỡng" }
+ *     responses:
+ *       200:
+ *         description: Kết quả tìm kiếm
+ */
+router.get('/search', verifyToken, isAdmin, productController.searchProduct);
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     AdminProductFilterRequest:
+ *       type: object
+ *       properties:
+ *         categoryId: { type: integer, example: 2 }
+ *         brandId: { type: integer, example: 3 }
+ *         priceMin: { type: number, example: 100000 }
+ *         priceMax: { type: number, example: 500000 }
+ *         inStock: { type: boolean, example: true }
+ *
+ * /api/admin/products/filter:
+ *   post:
+ *     summary: Lọc sản phẩm (admin)
+ *     tags: [Products (Admin)]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AdminProductFilterRequest'
+ *     responses:
+ *       200:
+ *         description: Kết quả lọc
+ */
+router.post('/filter', verifyToken, isAdmin, productController.filterProducts);
+
+/**
+ * @openapi
+ * /api/admin/products/sort:
+ *   get:
+ *     summary: Sắp xếp sản phẩm (admin)
+ *     tags: [Products (Admin)]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: sortBy
+ *         description: Trường sắp xếp
+ *         schema:
+ *           type: string
+ *           enum: [Name_Product, Price, Stock, createdAt]
+ *           example: Price
+ *       - in: query
+ *         name: order
+ *         description: Thứ tự sắp xếp
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           example: asc
+ *     responses:
+ *       200:
+ *         description: Danh sách đã sắp xếp
+ */
+router.get('/sort', verifyToken, isAdmin, productController.sortProducts);
+
+// giữ các route động ở dưới để tránh conflict
+router.get('/:id', verifyToken, isAdmin, productController.getProductById);
+router.put('/:id', verifyToken, isAdmin, productController.updateProduct);
+router.delete('/:id', verifyToken, isAdmin, productController.deleteProduct);
 
 module.exports = router;

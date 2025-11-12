@@ -31,7 +31,7 @@ const { verifyToken, isAdmin } = require('../../utils/jwt');
  *       201:
  *         description: Danh mục được tạo
  */
-router.post('/categories', verifyToken, isAdmin, categoryController.createCategory);
+router.post('/', verifyToken, isAdmin, categoryController.createCategory);
 
 /**
  * @openapi
@@ -46,7 +46,7 @@ router.post('/categories', verifyToken, isAdmin, categoryController.createCatego
  *       200:
  *         description: Danh sách danh mục
  */
-router.get('/categories', verifyToken, isAdmin, categoryController.getAllCategories);
+router.get('/', verifyToken, isAdmin, categoryController.getAllCategories);
 
 /**
  * @openapi
@@ -69,7 +69,7 @@ router.get('/categories', verifyToken, isAdmin, categoryController.getAllCategor
  *       404:
  *         description: Không tìm thấy
  */
-router.get('/categories/:id', verifyToken, isAdmin, categoryController.getCategoryById);
+router.get('/:id', verifyToken, isAdmin, categoryController.getCategoryById);
 
 /**
  * @openapi
@@ -102,7 +102,7 @@ router.get('/categories/:id', verifyToken, isAdmin, categoryController.getCatego
  *       200:
  *         description: Đã cập nhật
  */
-router.put('/categories/:id', verifyToken, isAdmin, categoryController.updateCategory);
+router.put('/:id', verifyToken, isAdmin, categoryController.updateCategory);
 
 /**
  * @openapi
@@ -123,6 +123,6 @@ router.put('/categories/:id', verifyToken, isAdmin, categoryController.updateCat
  *       204:
  *         description: Đã xóa
  */
-router.delete('/categories/:id', verifyToken, isAdmin, categoryController.deleteCategory);
+router.delete('/:id', verifyToken, isAdmin, categoryController.deleteCategory);
 
 module.exports = router;

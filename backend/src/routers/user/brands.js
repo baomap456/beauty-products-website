@@ -14,7 +14,7 @@ const brandController = require('../../controllers/brand.controller');
  *       200:
  *         description: Danh sách thương hiệu
  */
-router.get('/brands', brandController.getAllBrands);
+router.get('/', brandController.getAllBrands);
 
 /**
  * @openapi
@@ -35,6 +35,6 @@ router.get('/brands', brandController.getAllBrands);
  *       404:
  *         description: Không tìm thấy thương hiệu
  */
-router.get('/brands/:id', brandController.getBrandById);
+router.get('/:id', brandController.getBrandById);
 
 module.exports = router;

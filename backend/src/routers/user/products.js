@@ -13,7 +13,7 @@ const productController = require('../../controllers/product.controller');
  *       200:
  *         description: Danh sách sản phẩm
  */
-router.get('/products', productController.getAllProducts);
+router.get('/', productController.getAllProducts);
 
 /**
  * @openapi
@@ -34,7 +34,7 @@ router.get('/products', productController.getAllProducts);
  *       404:
  *         description: Không tìm thấy sản phẩm
  */
-router.get('/products/:id', productController.getProductById);
+router.get('/:id', productController.getProductById);
 
 /**
  * @openapi
@@ -56,7 +56,7 @@ router.get('/products/:id', productController.getProductById);
  *       200:
  *         description: Danh sách phân trang
  */
-router.get('/products/paginated', productController.getPaginatedProducts);
+router.get('/paginated', productController.getPaginatedProducts);
 
 /**
  * @openapi
@@ -74,7 +74,7 @@ router.get('/products/paginated', productController.getPaginatedProducts);
  *       200:
  *         description: Kết quả tìm kiếm
  */
-router.get('/products/search', productController.searchProduct);
+router.get('/search', productController.searchProduct);
 
 /**
  * @openapi
@@ -92,7 +92,7 @@ router.get('/products/search', productController.searchProduct);
  *       200:
  *         description: Danh sách đã lọc
  */
-router.post('/products/filter', productController.filterProducts);
+router.post('/filter', productController.filterProducts);
 
 /**
  * @openapi
@@ -114,6 +114,6 @@ router.post('/products/filter', productController.filterProducts);
  *       200:
  *         description: Danh sách đã sắp xếp
  */
-router.get('/products/sort', productController.sortProducts);
+router.get('/sort', productController.sortProducts);
 
 module.exports = router;

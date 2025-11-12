@@ -21,8 +21,9 @@ const options = {
                 }
             }
         },
-        security: [{ bearerAuth: [] }]
+        security: [{ bearerAuth: [] }],
     },
+
     // quét tất cả file trong routers và các thư mục con
     apis: [path.join(__dirname, '..', 'routers', '**', '*.js')]
 };

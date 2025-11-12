@@ -14,7 +14,7 @@ const categoryController = require('../../controllers/category.controller');
  *       200:
  *         description: Danh sách danh mục
  */
-router.get('/categories', categoryController.getAllCategories);
+router.get('/', categoryController.getAllCategories);
 
 /**
  * @openapi
@@ -35,6 +35,6 @@ router.get('/categories', categoryController.getAllCategories);
  *       404:
  *         description: Không tìm thấy danh mục
  */
-router.get('/categories/:id', categoryController.getCategoryById);
+router.get('/:id', categoryController.getCategoryById);
 
 module.exports = router;

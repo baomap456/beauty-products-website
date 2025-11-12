@@ -31,7 +31,7 @@ const { verifyToken, isAdmin } = require('../../utils/jwt');
  *       201:
  *         description: Thương hiệu được tạo
  */
-router.post('/brands', verifyToken, isAdmin, brandController.createBrand);
+router.post('/', verifyToken, isAdmin, brandController.createBrand);
 
 /**
  * @openapi
@@ -46,7 +46,7 @@ router.post('/brands', verifyToken, isAdmin, brandController.createBrand);
  *       200:
  *         description: Danh sách thương hiệu
  */
-router.get('/brands', verifyToken, isAdmin, brandController.getAllBrands);
+router.get('/', verifyToken, isAdmin, brandController.getAllBrands);
 
 /**
  * @openapi
@@ -69,7 +69,7 @@ router.get('/brands', verifyToken, isAdmin, brandController.getAllBrands);
  *       404:
  *         description: Không tìm thấy
  */
-router.get('/brands/:id', verifyToken, isAdmin, brandController.getBrandById);
+router.get('/:id', verifyToken, isAdmin, brandController.getBrandById);
 
 /**
  * @openapi
@@ -123,6 +123,6 @@ router.put('/brands/:id', verifyToken, isAdmin, brandController.updateBrand);
  *       204:
  *         description: Đã xóa
  */
-router.delete('/brands/:id', verifyToken, isAdmin, brandController.deleteBrand);
+router.delete('/:id', verifyToken, isAdmin, brandController.deleteBrand);
 
 module.exports = router;
