@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-// import DashboardPage from './pages/DashboardPage';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import DashboardPage from './pages/admin/DashboardPage';
 import ProtectedRoute from './components/ProtectedRouter';
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              {/* <DashboardPage /> */}
+              <DashboardPage />
             </ProtectedRoute>
           }
         />

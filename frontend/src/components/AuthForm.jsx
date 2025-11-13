@@ -1,20 +1,23 @@
 import React from "react";
 import { TextField, Button, Box, Typography } from '@mui/material';
 const AuthForm = ({ mode = 'login', onSubmit }) => {
-    const [formData, setFormData] = React.useState({
-        FullName: '',
-        Email: '',
-        Password: '',
-    });
+    const [formData, setFormData] = React.useState(
+    mode === 'login'
+        ? { Email: '', Password: '' }
+        : { FullName: '', Email: '', Password: '' }
+    );
     const [error, setError] = React.useState('');
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        console.log('Submitting payload:', formData); 
+        console.log(formData)
         try {
             await onSubmit(formData);
         } catch (error) {

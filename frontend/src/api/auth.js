@@ -1,8 +1,8 @@
 import axios from "./axios";
 
-const login = async (Email, Password) => {
+const login = async (data) => {
     try {
-        const response = await axios.post("/login", { Email, Password });
+        const response = await axios.post("/login",data);
         return response.data;
     } catch (error) {
         throw error;

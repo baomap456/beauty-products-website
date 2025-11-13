@@ -73,7 +73,7 @@ async function login(Email, Password) {
 
 async function getUserProfile(userId) {
     const user = await User.findByPk(userId, {
-        include: [{ model: Role, attributes: ['Name'] }],
+        include: [{ model: Role, attributes: ['Name_Role'] }],
         attributes: { exclude: ['Password'] }
     });
 
