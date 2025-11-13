@@ -1,27 +1,15 @@
-import React, { useState,useEffect } from 'react';
+import { useState } from 'react';
 import { Box, Grid, Toolbar } from '@mui/material';
 import Sidebar from '../../components/admin/Sidebar';
 import Navbar from '../../components/admin/Navbar';
 import StatCard from '../../components/admin/StatCard';
-import {getProfile} from '../../api/auth';
+
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    // Fetch user profile from backend
-    const fetchUserProfile = async () => {
-      try {
-        const response = await getProfile();
-          setUser(response.user);
-      } catch (error) {
-        console.error('Failed to fetch user profile:', error);
-      }
-    };
 
-    fetchUserProfile();
-  }, []);
+
 
   const [stats] = useState({
     orders: 124,
@@ -39,12 +27,12 @@ const Dashboard = () => {
     { month: 'Jun', revenue: 1840 },
   ]);
 
-  
+
 
   return (
     <Box sx={{ display: 'flex' }}>
       <Navbar />
-      <Sidebar fullname={user?.FullName || ''} />
+      <Sidebar fullname={'admin'} />
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
         <Grid container spacing={2} mb={3}>

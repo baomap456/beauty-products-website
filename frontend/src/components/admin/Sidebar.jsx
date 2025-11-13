@@ -1,88 +1,95 @@
 import React from 'react';
-import { Box, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Divider, Avatar, Typography } from '@mui/material';
-import LogoutIcon from "@mui/icons-material/Logout";
+import { NavLink, useNavigate } from 'react-router-dom';
+import {
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Box,
+  Typography,
+  Divider,
+  Avatar,
+  Stack
+} from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
-import StorefrontIcon from '@mui/icons-material/Storefront';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import { useNavigate, useLocation } from 'react-router-dom';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const drawerWidth = 240;
 
-const Sidebar = ({ fullname }) => {
+const Sidebar = ({ fullname = 'Admin' }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
+
+  function handleLogout() {
+    localStorage.removeItem('token');
+    navigate('/login', { replace: true });
   }
 
-  const menuItems = [
-    { text: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
-    { text: 'Users', path: '/dashboard/users', icon: <PeopleIcon /> },
-    { text: 'Products', path: '/dashboard/products', icon: <StorefrontIcon /> },
-    { text: 'Orders', path: '/dashboard/orders', icon: <ReceiptLongIcon /> },
-    { text: 'Logout', icon: <LogoutIcon />, onClick: handleLogout }
+  const items = [
+    { text: 'Dashboard', path: '/dashboard', exact: true, icon: <DashboardIcon /> },
+    { text: 'Products', path: '/dashboard/products', exact: false, icon: <InventoryIcon /> }
   ];
 
   return (
     <Drawer
       variant="permanent"
-      anchor="left"
-      PaperProps={{
-        sx: {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          bgcolor: 'background.paper',
-          borderRight: 1,
-          borderColor: 'divider',
-        },
-      }}
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        '& .MuiDrawer-paper': { width: drawerWidth },
+        '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box' }
       }}
     >
-      <Toolbar>
-        <Box display="flex" alignItems="center" gap={2}>
-          <Avatar sx={{ bgcolor: 'primary.main' }}>{fullname ? fullname.charAt(0).toUpperCase() : ''}</Avatar>
-          <Box>
-            <Typography variant="subtitle1" fontWeight={700}>Hello, {fullname}</Typography>
-            <Typography variant="caption" color="text.secondary">Manage store</Typography>
-          </Box>
+      {/* keep toolbar spacer so drawer sits below fixed AppBar */}
+      <Toolbar sx={{ minHeight: 64 }} />
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box sx={{ p: 2 }}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Avatar sx={{ bgcolor: 'primary.main' }}>{String(fullname).charAt(0).toUpperCase()}</Avatar>
+            <Box>
+              <Typography variant="subtitle1" noWrap>{fullname}</Typography>
+              <Typography variant="caption" color="text.secondary">Admin</Typography>
+            </Box>
+          </Stack>
         </Box>
-      </Toolbar>
-      <Divider />
-      <List>
-        {menuItems.map((item) => {
-          const selected = item.path && (location.pathname === item.path || location.pathname.startsWith(item.path + '/'));
-          return (
-            <ListItemButton
-              key={item.text}
-              selected={selected}
-              onClick={() => {
-                if (item.onClick) return item.onClick();
-                if (item.path) return navigate(item.path);
-              }}
-              sx={{
-                mb: 0.5,
-                mx: 1,
-                borderRadius: 1,
-                '&.Mui-selected': {
-                  bgcolor: 'primary.light',
-                  color: 'primary.contrastText',
-                  '& .MuiListItemIcon-root': { color: 'primary.contrastText' },
-                },
-                '&:hover': { bgcolor: 'action.hover' },
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 36, cursor: item.onClick ? 'pointer' : 'default' }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          );
-        })}
-      </List>
+
+        <Divider />
+
+        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+          <List>
+            {items.map((item) => (
+              <ListItemButton
+                key={item.text}
+                component={NavLink}
+                to={item.path}
+                end={item.exact}
+                sx={{
+                  mb: 0.5,
+                  mx: 1,
+                  borderRadius: 1,
+                  '&.active': {
+                    bgcolor: 'primary.main',
+                    color: 'primary.contrastText',
+                    '& .MuiListItemIcon-root': { color: 'primary.contrastText' }
+                  }
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            ))}
+          </List>
+        </Box>
+
+        <Divider />
+        <Box sx={{ p: 1 }}>
+          <ListItemButton onClick={handleLogout}>
+            <ListItemIcon><LogoutIcon /></ListItemIcon>
+            <ListItemText primary="Logout" />
+          </ListItemButton>
+        </Box>
+      </Box>
     </Drawer>
   );
 };

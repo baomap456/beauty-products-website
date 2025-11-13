@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from './axios';
 
 const getProducts = async () => {
     try {
@@ -46,10 +46,24 @@ const deleteProduct = async (productId) => {
     }
 }
 
+const uploadImages = async (productId, imageFormData) => {
+    try {
+        const response = await axios.post(`/admin/products/${productId}/images`, imageFormData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export {
     getProducts,
     getProductById,
     createProduct,
     updateProduct,
     deleteProduct,
+    uploadImages,
 };
