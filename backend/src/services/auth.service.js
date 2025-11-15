@@ -35,7 +35,7 @@ async function register(userData) {
 
 async function login(Email, Password) {
 
-    const user = await User.findOne({ where: { Email } });
+    const user = await User.findOne({ where: { Email }, include: [{ model: Role, attributes: ['Name_Role'] }] });
     if (!user) {
         throw new Error('Thông tin đăng nhập không chính xác');
     }
@@ -51,7 +51,7 @@ async function login(Email, Password) {
     const payload = {
         sub: String(userId),
         email: user.Email,
-        role: user.Role_ID,
+        role: user.Role.Name_Role,
         jti: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
     };
 
@@ -62,7 +62,7 @@ async function login(Email, Password) {
 
     const safeUser = user.toJSON();
     delete safeUser.Password;
-
+    delete safeUser.Role_ID;
     return {
         accessToken: token,
         tokenType: 'Bearer',

@@ -24,7 +24,7 @@ const AdminLayout = ({ user }) => {
                 }}
             >
                 {/* spacer same height as AppBar */}
-                <Toolbar sx={{ minHeight: 64 }} />
+                <Toolbar />
                 {/* page content */}
                 <Outlet />
             </Box>

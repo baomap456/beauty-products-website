@@ -6,7 +6,8 @@ const handleError = (res, error, message = 'Internal server error') => {
 };
 
 function validateRequired(body) {
-    if (!body || !body.name || body.price == null) return false;
+    // Kiểm tra các key viết hoa
+    if (!body || !body.Name_Product || body.Price == null || body.Stock == null || body.Category_ID == null || body.Brand_ID == null) return false;
     return true;
 }
 

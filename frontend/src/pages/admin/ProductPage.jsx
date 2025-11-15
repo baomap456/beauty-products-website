@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import ProductList from '../../components/product/ProductList';
+import ReusableTable from '../../components/UI/ReusableTable';
 import ProductForm from '../../components/product/ProductForm';
-import { getProducts, createProduct, updateProduct, deleteProduct, uploadImages } from '../../api/product';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../../api/product';
 import {
     Box,
     Button,
-    Container,
     Typography,
     CircularProgress,
     Alert,
@@ -16,10 +15,15 @@ import {
     Snackbar,
     Toolbar
 } from '@mui/material';
+import { getBrands } from '../../api/brand';
+import { getCategories } from '../../api/category';
+import ActionButtons from '../../components/UI/ActionButtons';
 
 const ProductPage = () => {
     //API 
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -33,6 +37,45 @@ const ProductPage = () => {
 
     // Snackbar
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    const columns = [
+        {
+            header: 'ID', // Tiêu đề cột
+            field: 'ID_Product' // Tên trường trong data
+        },
+        {
+            header: 'Name_Product',
+            field: 'Name_Product'
+        },
+        {
+            header: 'Price',
+            field: 'Price'
+        },
+        {
+            header: 'Stock',
+            field: 'Stock'
+        },
+        // --- Đây là phần "tùy chỉnh" ---
+        {
+            header: 'Category',
+            // Dùng "render" vì nó là object lồng nhau
+            render: (row) => row.Category.Name_Category
+        },
+        {
+            header: 'Brand',
+            render: (row) => row.Brand.Name_Brand
+        },
+        {
+            header: 'Actions',
+            // Dùng "render" để hiển thị component
+            render: (row) => (
+                <ActionButtons
+                    onEdit={() => handleEdit(row)}
+                    onDelete={() => handleDeleteRequest(row)}
+                />
+            )
+        }
+    ];
 
     const openSnackbar = (message, severity = 'success') =>
         setSnackbar({ open: true, message, severity });
@@ -57,7 +100,7 @@ const ProductPage = () => {
     const handleConfirmDelete = async () => {
         if (!productToDelete) return;
         try {
-            await deleteProduct(productToDelete.id);
+            await deleteProduct(productToDelete.ID_Product);
             const data = await getProducts();
             setProducts(data);
             openSnackbar('Deleted product successfully');
@@ -70,21 +113,20 @@ const ProductPage = () => {
         }
     };
 
-    const handleSubmitProduct = async (formdata, mainImage, secondaryImage) => {
+    const handleSubmitProduct = async (formdata) => {
         try {
-            const imageFormData = new FormData();
-            if (mainImage) imageFormData.append('mainImage', mainImage);
-            (secondaryImage || []).forEach((image) => imageFormData.append('secondaryImage', image));
-
-            const resultUpload = await uploadImages(productToEdit ? productToEdit.id : 'new', imageFormData);
+            // const imageFormData = new FormData();
+            // if (mainImage) imageFormData.append('mainImage', mainImage);
+            // (secondaryImage || []).forEach((image) => imageFormData.append('secondaryImage', image));
+            // const resultUpload = await uploadImages(productToEdit ? productToEdit.ID_Product : 'new', imageFormData);
             const productData = {
                 ...formdata,
-                mainImage: resultUpload.mainImageUrl,
-                secondaryImage: resultUpload.secondaryImageUrls
+                // mainImage: resultUpload.mainImageUrl,
+                // secondaryImage: resultUpload.secondaryImageUrls
             };
-
+            console.debug('Sending product payload:', productData);
             if (productToEdit) {
-                await updateProduct(productToEdit.id, productData);
+                await updateProduct(productToEdit.ID_Product, productData);
                 openSnackbar('Updated product successfully');
             } else {
                 await createProduct(productData);
@@ -100,11 +142,47 @@ const ProductPage = () => {
         }
     };
 
+
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const data = await getProducts();
-                setProducts(data);
+                // 1. Vẫn gọi cả 3 API
+                const [productsResponse, brandsResponse, categoriesResponse] = await Promise.all([
+                    getProducts(),
+                    getBrands(),
+                    getCategories()
+                ]);
+
+                // 2. Trích xuất mảng dữ liệu (Giả sử API trả về { items: [...] })
+                //    Nếu API của bạn trả về mảng trực tiếp, hãy xóa ".items"
+                const productsData = productsResponse.items || productsResponse;
+                const brandsData = brandsResponse.items || brandsResponse;
+                const categoriesData = categoriesResponse.items || categoriesResponse;
+
+                // 3. Gộp dữ liệu lại cho ProductList (để fix lỗi crash)
+                const productsWithDetails = productsData.map(product => {
+                    // Tìm category tương ứng
+                    const category = categoriesData.find(c => c.ID_Category === product.Category_ID);
+
+
+                    // Tìm brand tương ứng
+                    const brand = brandsData.find(b => b.ID_Brand === product.Brand_ID);
+
+                    // Trả về product mới với object lồng nhau
+                    return {
+                        ...product,
+                        Category: category || { Name_Category: 'N/A' }, // Gắn object category
+                        Brand: brand || { Name_Brand: 'N/A' }       // Gắn object brand
+                    };
+                });
+
+                console.log('Products with details:', productsWithDetails);
+
+                // 4. Set state với dữ liệu đã xử lý
+                setCategories(categoriesData); // Dùng cho dropdown
+                setBrands(brandsData);       // Dùng cho dropdown
+                setProducts(productsWithDetails); // Dùng cho bảng (đã gộp)
+
             } catch (err) {
                 setError(err.message || 'Failed to load products');
             } finally {
@@ -135,10 +213,9 @@ const ProductPage = () => {
                     <Alert severity="error">{error}</Alert>
                 </Box>
             ) : (
-                <ProductList
-                    products={products}
-                    onEditProduct={handleEdit}
-                    onDeleteProduct={handleDeleteRequest}
+                <ReusableTable
+                    data={products}
+                    columns={columns}
                 />
             )}
 
@@ -146,7 +223,13 @@ const ProductPage = () => {
             <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
                 <DialogTitle>{productToEdit ? 'Edit Product' : 'Add Product'}</DialogTitle>
                 <DialogContent dividers>
-                    <ProductForm productToEdit={productToEdit} onSubmit={handleSubmitProduct} onClose={handleCloseDialog} />
+                    <ProductForm
+                        productToEdit={productToEdit}
+                        onSubmit={handleSubmitProduct}
+                        onClose={handleCloseDialog}
+                        categories={categories}
+                        brands={brands}
+                    />
                 </DialogContent>
             </Dialog>
 
