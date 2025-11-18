@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import ReusableTable from '../../components/UI/ReusableTable';
 import CategoryForm from '../../components/category/CategoryForm';
 import ActionButtons from '../../components/UI/ActionButtons';
-import { getCategories, createCategory, updateCategory, deleteCategory } from '../../api/category';
+import { getCategories, createCategory, updateCategory, deleteCategory } from '../../api/admin/category';
 import {
     Box,
     Button,

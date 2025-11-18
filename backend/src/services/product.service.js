@@ -4,17 +4,55 @@ const Product = db.Product;
 const Category = db.Category;
 const Brand = db.Brand;
 
-async function getAllProducts(page = 1, limit = 20) {
-    const offset = (page - 1) * limit;
+async function getAllProducts({ page = 1, limit = 20, name, category_id, brand_id, minPrice, maxPrice }) {
     try {
-        return await Product.findAll({
+        // 1. Xử lý phân trang
+        const offset = (page - 1) * limit;
+        const limitNum = parseInt(limit);
+
+        // 2. Xây dựng câu lệnh WHERE (Lọc & Tìm kiếm gộp làm một)
+        const whereClause = {};
+
+        // Tìm kiếm theo tên (Tương đối - LIKE)
+        if (name) {
+            whereClause.Name_Product = { [Op.like]: `%${name}%` }; // Chú ý tên trường trong DB là Name_Product hay Product_Name
+        }
+
+        // Lọc theo Category
+        if (category_id) {
+            whereClause.Category_ID = category_id;
+        }
+
+        // Lọc theo Brand
+        if (brand_id) {
+            whereClause.Brand_ID = brand_id;
+        }
+
+        // Lọc theo Giá
+        if (minPrice && maxPrice) {
+            whereClause.Price = { [Op.between]: [minPrice, maxPrice] };
+        } else if (minPrice) {
+            whereClause.Price = { [Op.gte]: minPrice };
+        }
+
+        // 3. Gọi Database: Dùng findAndCountAll để lấy cả dữ liệu và tổng số
+        const { count, rows } = await Product.findAndCountAll({
+            where: whereClause,
             include: [
                 { model: Category, as: 'Category' },
                 { model: Brand, as: 'Brand' }
             ],
-            offset,
-            limit
+            offset: offset,
+            limit: limitNum,
+            order: [['createdAt', 'DESC']] // Sắp xếp mới nhất lên đầu (Tùy chọn)
         });
+
+        // 4. Trả về cấu trúc chuẩn cho Frontend
+        return {
+            totalCount: count, // Tổng số sản phẩm (để tính phân trang)
+            items: rows        // Danh sách sản phẩm trang hiện tại
+        };
+
     } catch (error) {
         console.error('Error in getAllProducts service:', error);
         throw error;
@@ -127,105 +165,7 @@ async function getProductsByBrand(brandId) {
     }
 }
 
-async function getProductsWithFilters(filters) {
-    try {
-        const whereClause = {};
 
-        if (filters.categoryId) {
-            whereClause.Category_ID = filters.categoryId;
-        }
-        if (filters.brandId) {
-            whereClause.Brand_ID = filters.brandId;
-        }
-        if (filters.minPrice) {
-            whereClause.Price = { [Op.gte]: filters.minPrice };
-        }
-        if (filters.maxPrice) {
-            whereClause.Price = whereClause.Price || {};
-            whereClause.Price[Op.lte] = filters.maxPrice;
-        }
-        if (filters.Product_Name) {
-            whereClause.Product_Name = { [Op.like]: `%${filters.Product_Name}%` };
-        }
-
-        return await Product.findAll({
-            where: whereClause,
-            include: [
-                { model: Category, as: 'Category' },
-                { model: Brand, as: 'Brand' }
-            ]
-        });
-    } catch (error) {
-        console.error('Error in getProductsWithFilters service:', error);
-        throw error;
-    }
-}
-
-async function searchProduct(Keyword) {
-    try {
-        return await Product.findAll({
-            where: {
-                Product_Name: { [Op.like]: `%${Keyword}%` }
-            },
-            include: [
-                { model: Category, as: 'Category' },
-                { model: Brand, as: 'Brand' }
-            ]
-        });
-    } catch (error) {
-        console.error('Error in searchProduct service:', error);
-        throw error;
-    }
-
-}
-
-async function getPaginatedProducts(page, limit, filters) {
-    const offset = (page - 1) * limit;
-    try {
-        const whereClause = {};
-        if (filters.categoryId) {
-            whereClause.Category_ID = filters.categoryId;
-        }
-        if (filters.brandId) {
-            whereClause.Brand_ID = filters.brandId;
-        }
-        if (filters.minPrice) {
-            whereClause.Price = { [Op.gte]: filters.minPrice };
-        }
-        if (filters.maxPrice) {
-            whereClause.Price = whereClause.Price || {};
-            whereClause.Price[Op.lte] = filters.maxPrice;
-        }
-        if (filters.Product_Name) {
-            whereClause.Product_Name = { [Op.like]: `%${filters.Product_Name}%` };
-        }
-
-        return {
-            products: rows,
-            totalItems: count,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page
-        };
-    } catch (error) {
-        console.error('Error in getPaginatedProducts service:', error);
-        throw error;
-    }
-}
-
-async function sortProducts(sortBy, order) {
-    try {
-        return await Product.findAll({
-            order: [[sortBy, order]],
-            include: [
-                { model: Category, as: 'Category' },
-                { model: Brand, as: 'Brand' }
-            ]
-        });
-    } catch (error) {
-        console.error('Error in sortProducts service:', error);
-        throw error;
-    }
-}
 
 module.exports = {
     getAllProducts,
@@ -235,8 +175,5 @@ module.exports = {
     deleteProduct,
     getProductsByCategory,
     getProductsByBrand,
-    getProductsWithFilters,
-    searchProduct,
-    getPaginatedProducts,
-    sortProducts,
+
 };

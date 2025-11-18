@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import ReusableTable from '../../components/UI/ReusableTable';
 import ProductForm from '../../components/product/ProductForm';
-import { getProducts, createProduct, updateProduct, deleteProduct } from '../../api/product';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../../api/admin/product';
 import {
     Box,
     Button,
@@ -15,8 +15,8 @@ import {
     Snackbar,
     Toolbar
 } from '@mui/material';
-import { getBrands } from '../../api/brand';
-import { getCategories } from '../../api/category';
+import { getBrands } from '../../api/admin/brand';
+import { getCategories } from '../../api/admin/category';
 import ActionButtons from '../../components/UI/ActionButtons';
 
 const ProductPage = () => {

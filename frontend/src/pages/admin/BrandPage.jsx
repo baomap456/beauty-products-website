@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReusableTable from '../../components/UI/ReusableTable';
 import BrandForm from '../../components/brand/BrandForm';
 import ActionButtons from '../../components/UI/ActionButtons';
-import { getBrands, createBrand, updateBrand, deleteBrand } from '../../api/brand';
+import { getBrands, createBrand, updateBrand, deleteBrand } from '../../api/admin/brand';
 import { Box, Dialog, DialogContent, Toolbar, Typography, Button, CircularProgress, Alert, DialogActions, Snackbar } from '@mui/material';
 const BrandPage = () => {
     const [brands, setBrands] = useState([]);
@@ -83,6 +83,8 @@ const BrandPage = () => {
 
     const handleSubmitBrand = async (brandData) => {
         try {
+            console.log("Đang sửa Brand:", brandToEdit); // <--- Kiểm tra xem có ID_Brand không?
+            console.log("Dữ liệu gửi đi:", brandData);
             if (brandToEdit) {
                 await updateBrand(brandToEdit.ID_Brand, brandData);
                 openSnackbar('Updated brand successfully');
@@ -124,7 +126,7 @@ const BrandPage = () => {
         <Box>
             <Toolbar />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h4">Category Management</Typography>
+                <Typography variant="h4">Brand Management</Typography>
                 <Button variant="contained" color="primary" onClick={handleOpenDialog}>
                     Add Category
                 </Button>

@@ -13,8 +13,31 @@ function validateRequired(body) {
 
 const getAllProducts = async (req, res) => {
     try {
-        const products = await productService.getAllProducts();
-        res.json(products);
+        // 1. Lấy tất cả tham số từ URL
+        const {
+            page,
+            limit,
+            name,       // Frontend gửi 'name'
+            category_id,// Frontend gửi 'category_id'
+            brand_id,   // Frontend gửi 'brand_id'
+            minPrice,
+            maxPrice
+        } = req.query;
+
+        // 2. Gọi Service với object filters
+        const result = await productService.getAllProducts({
+            page,
+            limit,
+            name,
+            category_id,
+            brand_id,
+            minPrice,
+            maxPrice
+        });
+
+        // 3. Trả về kết quả (gồm items và totalCount)
+        res.json(result);
+
     } catch (error) {
         handleError(res, error, 'Error fetching products');
     }
@@ -76,15 +99,6 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-const getPaginatedProducts = async (req, res) => {
-    try {
-        const { page, limit, ...filters } = req.query;
-        const paginatedProducts = await productService.getPaginatedProducts(page, limit, filters);
-        res.json(paginatedProducts);
-    } catch (error) {
-        handleError(res, error, 'Error fetching paginated products');
-    }
-};
 
 const searchProduct = async (req, res) => {
     try {
@@ -106,17 +120,6 @@ const filterProducts = async (req, res) => {
     }
 };
 
-const getPaginatedProduct = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 20;
-        const filters = req.query.filters || {};
-        const paginatedProducts = await productService.getPaginatedProducts(page, limit, filters);
-        res.json(paginatedProducts);
-    } catch (error) {
-        handleError(res, error, 'Error fetching paginated products');
-    }
-};
 
 const sortProducts = async (req, res) => {
     try {
@@ -134,9 +137,7 @@ module.exports = {
     createProduct,
     updateProduct,
     deleteProduct,
-    getPaginatedProducts,
     searchProduct,
     filterProducts,
-    getPaginatedProduct,
     sortProducts
 };

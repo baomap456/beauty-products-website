@@ -18,6 +18,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CategoryIcon from '@mui/icons-material/Category';
 import StarIcon from '@mui/icons-material/Star';
+import HomeIcon from '@mui/icons-material/Home';
 
 const drawerWidth = 240;
 
@@ -30,6 +31,7 @@ const Sidebar = ({ fullname = 'Admin' }) => {
   }
 
   const items = [
+    { text: 'Home', path: '/', exact: true, icon: <HomeIcon /> },
     { text: 'Dashboard', path: '/dashboard', exact: true, icon: <DashboardIcon /> },
     { text: 'Products', path: '/dashboard/products', exact: false, icon: <InventoryIcon /> },
     { text: 'Categories', path: '/dashboard/categories', exact: false, icon: <CategoryIcon /> },

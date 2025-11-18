@@ -102,7 +102,7 @@ router.get('/:id', verifyToken, isAdmin, brandController.getBrandById);
  *       200:
  *         description: Đã cập nhật
  */
-router.put('/brands/:id', verifyToken, isAdmin, brandController.updateBrand);
+router.put('/:id', verifyToken, isAdmin, brandController.updateBrand);
 
 /**
  * @openapi

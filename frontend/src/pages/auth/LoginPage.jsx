@@ -8,15 +8,11 @@ const LoginPage = () => {
     const handleLogin = async (data) => {
         try {
             const res = await login(data);
-            localStorage.setItem('token', res.accessToken); // lưu token
+            localStorage.setItem('token', res.accessToken);
             const userRoleName = res.user?.Role?.Name_Role;
-            console.log('User role:', userRoleName);
             localStorage.setItem('userRole', userRoleName);
-            if (userRoleName === 'admin') {
-                navigate('/dashboard');
-            } else {
-                navigate('/');
-            }
+            localStorage.setItem('currentUser', JSON.stringify(res.user));
+            navigate('/');
         } catch (error) {
             console.error('Login failed:', error);
         }

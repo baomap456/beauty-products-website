@@ -161,25 +161,6 @@ router.put('/:id', verifyToken, isAdmin, productController.updateProduct);
  */
 router.delete('/:id', verifyToken, isAdmin, productController.deleteProduct);
 
-/**
- * @openapi
- * /api/admin/products/paginated:
- *   get:
- *     summary: Phân trang sản phẩm (admin)
- *     tags: [Products (Admin)]
- *     security: [{ bearerAuth: [] }]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema: { type: integer, minimum: 1, example: 1 }
- *       - in: query
- *         name: limit
- *         schema: { type: integer, minimum: 1, maximum: 200, example: 10 }
- *     responses:
- *       200:
- *         description: Danh sách sản phẩm theo trang
- */
-router.get('/paginated', verifyToken, isAdmin, productController.getPaginatedProducts);
 
 /**
  * @openapi
