@@ -23,7 +23,6 @@ const Header = () => {
             setIsAdmin(true);
         }
     }, []);
-    const cartItemCount = 2;
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
     };
@@ -86,7 +85,7 @@ const Header = () => {
                         )}
                         {/* Giỏ hàng */}
                         <IconButton size="large" aria-label="show cart items" color="inherit" onClick={() => navigate('/cart')} sx={{ mr: 2 }}>
-                            <Badge badgeContent={cartItemCount} color="error">
+                            <Badge color="error">
                                 <ShoppingCartIcon />
                             </Badge>
                         </IconButton>

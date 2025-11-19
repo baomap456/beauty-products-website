@@ -6,9 +6,6 @@ const CartItem = db.CartItem;
 const Product = db.Product;
 const sequelize = db.sequelize;
 
-/**
- * Helpers
- */
 function createError(message, status = 400, code = 'ERROR') {
     const err = new Error(message);
     err.status = status;
@@ -30,9 +27,33 @@ function calculateTotalFromItems(items = []) {
     }, 0);
 }
 
-/**
- * Get or create cart (accepts optional transaction)
- */
+function formatCartResponse(cart) {
+    if (!cart) return { items: [], Total: 0 };
+
+    const flatItems = (cart.items || []).map(item => {
+        const product = item.product || {};
+        return {
+            ID_CartItem: item.ID_CartItem,
+            Quantity: item.Quantity,
+            // Thông tin Product được lôi ra ngoài
+            ID_Product: item.Product_ID,
+            Name_Product: product.Name_Product,
+            Price: parseFloat(product.Price || 0), // Đảm bảo là số
+            Stock: product.Stock,
+            Image: product.mainImage || product.Image || '', // Xử lý ảnh
+
+            // Giữ lại object gốc nếu cần (optional)
+            // product: product 
+        };
+    });
+
+    return {
+        ID_Cart: cart.ID_Cart,
+        Total: parseFloat(cart.Total || 0),
+        items: flatItems
+    };
+}
+
 async function getOrCreateCartForUser(userId, t = null) {
     try {
         const cart = await Cart.findOne({
@@ -41,8 +62,7 @@ async function getOrCreateCartForUser(userId, t = null) {
             transaction: t
         });
         if (cart) return cart;
-
-        return Cart.create({ User_ID: userId, Status: 'active', Total: 0 }, { transaction: t });
+        return await Cart.create({ User_ID: userId, Status: 'active', Total: 0 }, { transaction: t });
     } catch (err) {
         console.error({ action: 'getOrCreateCartForUser', userId, err });
         throw createError('Failed to get or create cart', 500, 'CART_CREATE_FAILED');
@@ -51,10 +71,11 @@ async function getOrCreateCartForUser(userId, t = null) {
 
 async function getCartByUser(userId) {
     try {
-        return Cart.findOne({
+        const cart = await Cart.findOne({
             where: { User_ID: userId, Status: 'active' },
             include: [{ model: CartItem, as: 'items', include: [{ model: Product, as: 'product' }] }]
         });
+        return formatCartResponse(cart);
     } catch (err) {
         console.error({ action: 'getCartByUser', userId, err });
         throw createError('Failed to fetch cart', 500, 'CART_FETCH_FAILED');
@@ -104,7 +125,7 @@ async function addItemToCart(userId, productId, quantity = 1) {
             cart.Total = total;
             await cart.save({ transaction: t });
 
-            return { cart, item };
+            return formatCartResponse({ cart, item });
         } catch (err) {
             console.error({ action: 'addItemToCart', userId, productId, quantity, err });
             throw err.code ? err : createError('Failed to add item to cart', 500, 'CART_ADD_FAILED');
@@ -112,16 +133,11 @@ async function addItemToCart(userId, productId, quantity = 1) {
     });
 }
 
-/**
- * Update cart item quantity.
- * If quantity === 0 => remove the item.
- */
+
 async function updateCartItem(userId, cartItemId, quantity) {
     if (!Number.isInteger(quantity) || quantity < 0) {
         throw createError('Quantity must be a non-negative integer', 400, 'INVALID_QUANTITY');
     }
-
-    // if 0 -> remove
     if (quantity === 0) {
         return removeCartItem(userId, cartItemId);
     }
@@ -143,7 +159,7 @@ async function updateCartItem(userId, cartItemId, quantity) {
             cart.Total = total;
             await cart.save({ transaction: t });
 
-            return { cart, item };
+            return formatCartResponse({ cart, item });
         } catch (err) {
             console.error({ action: 'updateCartItem', userId, cartItemId, quantity, err });
             throw err.code ? err : createError('Failed to update cart item', 500, 'CART_UPDATE_FAILED');
@@ -151,9 +167,6 @@ async function updateCartItem(userId, cartItemId, quantity) {
     });
 }
 
-/**
- * Remove cart item
- */
 async function removeCartItem(userId, cartItemId) {
     return sequelize.transaction(async (t) => {
         try {
@@ -179,9 +192,6 @@ async function removeCartItem(userId, cartItemId) {
     });
 }
 
-/**
- * Clear cart
- */
 async function clearCart(userId) {
     return sequelize.transaction(async (t) => {
         try {
@@ -198,11 +208,61 @@ async function clearCart(userId) {
     });
 }
 
+async function mergeCarts(userId, localItems = []) {
+    if (!Array.isArray(localItems) || localItems.length === 0) {
+        return getCartByUser(userId);
+    }
+    try {
+        return sequelize.transaction(async (t) => {
+            const cart = await getOrCreateCartForUser(userId, t);
+            const cartPk = Cart.primaryKeyAttribute || 'ID_Cart';
+            const cartIdVal = cart[cartPk] || cart.ID_Cart;
+
+            for (const localItem of localItems) {
+                const { Product_ID, Quantity } = localItem;
+
+                const product = await Product.findByPk(Product_ID, { transaction: t });
+                if (!product) continue;
+
+                let item = await CartItem.findOne({ where: { Cart_ID: cartIdVal, Product_ID }, transaction: t });
+
+                if (item) {
+                    item.Quantity = Number(item.Quantity) + Number(Quantity);
+                    await item.save({ transaction: t });
+                }
+                else {
+                    await CartItem.create({
+                        Cart_ID: cartIdVal,
+                        Product_ID,
+                        Quantity
+                    }, { transaction: t });
+                }
+            }
+            const items = await CartItem.findAll({ where: { Cart_ID: cartIdVal }, transaction: t });
+            const total = calculateTotalFromItems(items);
+            cart.Total = total;
+            await cart.save({ transaction: t });
+            return formatCartResponse(await Cart.findOne({
+                where: { ID_Cart: cartIdVal },
+                include: [{ model: CartItem, as: 'items', include: [{ model: Product, as: 'product' }] }],
+                transaction: t
+            }))
+        });
+    }
+    catch (err) {
+        console.error({ action: 'mergeCarts', userId, err });
+        throw createError('Failed to merge carts', 500, 'CART_MERGE_FAILED');
+    }
+
+}
+
+
 module.exports = {
     getOrCreateCartForUser,
     getCartByUser,
     addItemToCart,
     updateCartItem,
     removeCartItem,
-    clearCart
+    clearCart,
+    mergeCarts
 };

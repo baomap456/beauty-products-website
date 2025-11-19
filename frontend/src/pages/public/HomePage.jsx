@@ -14,9 +14,10 @@ import { getProducts } from '../../api/user/product';
 import { getCategories } from '../../api/user/category'
 import { getBrands } from '../../api/user/brand';
 
+import { useCart } from '../../contexts/CartContext';
 const HomePage = () => {
     const navigate = useNavigate();
-
+    const { addToCart } = useCart();
     // 1. State quản lý dữ liệu
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -58,8 +59,7 @@ const HomePage = () => {
     };
 
     const handleAddToCart = (product) => {
-        console.log("Thêm vào giỏ:", product);
-        // Logic Redux hoặc Context API để thêm vào giỏ hàng sẽ viết ở đây
+        addToCart(product, 1);
         alert(`Đã thêm ${product.Name_Product} vào giỏ!`);
     };
 

@@ -119,4 +119,38 @@ router.delete('/items/:itemId', verifyToken, ctrl.removeItem);
  */
 router.delete('/', verifyToken, ctrl.clear);
 
+/**
+ * @openapi
+ * /api/user/cart/merge:
+ *   post:
+ *     tags:
+ *       - Cart (User)
+ *     summary: Merge client cart items vào giỏ hàng hiện tại của người dùng
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     productId:
+ *                       type: integer
+ *                     quantity:
+ *                       type: integer
+ *                 example:
+ *                   - { "productId": 1, "quantity": 2 }
+ *                   - { "productId": 5, "quantity": 1 }
+ *     responses:
+ *       200:
+ *         description: Cart sau khi merge
+ */
+router.post('/merge', verifyToken, ctrl.mergeCart);
+
 module.exports = router;

@@ -10,6 +10,7 @@ import ProductCard from '../../components/common/ProductCard';
 import { getProducts } from '../../api/user/product';
 import { getCategories } from '../../api/user/category';
 import { getBrands } from '../../api/user/brand';
+import { useCart } from '../../contexts/CartContext';
 
 const ShopPage = () => {
     const location = useLocation();
@@ -19,7 +20,7 @@ const ShopPage = () => {
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const { addToCart } = useCart();
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const LIMIT = 12;
@@ -107,6 +108,11 @@ const ShopPage = () => {
         window.scrollTo(0, 0); // Cuộn lên đầu trang
     };
 
+    const handleAddToCart = (product) => {
+        addToCart(product, 1);
+        alert(`Đã thêm ${product.Name_Product} vào giỏ!`);
+    }
+
     return (
         <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', pb: 5 }}>
             <Toolbar />
@@ -170,7 +176,7 @@ const ShopPage = () => {
                                         // md=4: Laptop nhỏ 3 cột
                                         // lg=3: Màn hình lớn 4 cột
                                         <Grid item key={product.ID_Product} xs={12} sm={6} md={4} lg={3}>
-                                            <ProductCard product={product} />
+                                            <ProductCard product={product} onAddToCart={handleAddToCart} />
                                         </Grid>
                                     ))}
                                 </Grid>
