@@ -6,12 +6,14 @@ import { useNavigate } from 'react-router-dom';
 // Components
 import CartList from '../../components/cart/CartList';
 import CartSummary from '../../components/cart/CartSummary';
+import { useCart } from '../../contexts/CartContext';
 const CartPage = () => {
     const navigate = useNavigate();
     const [cartItems, setCartItems] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState(null);
     const [cartTotal, setCartTotal] = React.useState(0);
+    const { fetchCart } = useCart();
 
     const fetchCartItems = async () => {
         try {
@@ -38,24 +40,23 @@ const CartPage = () => {
             if (!window.confirm("Bạn có chắc muốn xóa sản phẩm này?")) return;
             await deleteCartItem(itemId);
             setCartItems(prevItems => prevItems.filter(item => item.ID_CartItem !== itemId));
-            fetchCartItems();
+            fetchCart();
         }
         catch (error) {
             console.error("Lỗi xóa sản phẩm:", error);
         }
     }
 
-    const handleUpdateQuantity = (itemId, newQuantity) => {
+    const handleUpdateQuantity = async (itemId, newQuantity) => {
         try {
-            const res = updateCartItem(itemId, newQuantity);
             setCartItems(prevItems => prevItems.map(item => {
                 if (item.ID_CartItem === itemId) {
                     return { ...item, Quantity: newQuantity };
                 }
                 return item;
             }));
-
-            setCartTotal(res.cart);
+            await updateCartItem(itemId, newQuantity);
+            fetchCart();
         }
         catch (error) {
             console.error("Lỗi cập nhật số lượng:", error);
@@ -81,7 +82,7 @@ const CartPage = () => {
             navigate('/login', { state: { from: '/cart' } });
         } else {
             // Nếu rồi -> Chuyển qua trang thanh toán
-            navigate('/checkout');
+            navigate('/addresses');
         }
     };
 

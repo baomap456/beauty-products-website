@@ -14,6 +14,7 @@ import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/public/HomePage';
 import ShopPage from './pages/public/ShopPage';
 import CartPage from './pages/public/CartPage';
+import AddressPage from './pages/public/AddressPage';
 import { CartProvider } from './contexts/CartContext';
 // import ProductDetail from './pages/public/ProductDetail';
 
@@ -47,7 +48,7 @@ function App() {
             {/* Trang chi tiết: localhost:3000/product/123 */}
             {/* <Route path="product/:id" element={<ProductDetail />} /> */}
             <Route path="cart" element={<CartPage />} />
-
+            <Route path="/addresses" element={<AddressPage />} />
           </Route>
 
         </Routes>

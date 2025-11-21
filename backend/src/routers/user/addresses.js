@@ -18,58 +18,45 @@ const { verifyToken } = require('../../utils/jwt');
  *           type: integer
  *         User_ID:
  *           type: integer
- *         FullName:
+ *         RecipientName:
  *           type: string
  *         Phone:
  *           type: string
- *         Street:
- *           type: string
- *         City:
+ *         AddressDetail:
  *           type: string
  *         Province:
  *           type: string
- *         Country:
+ *         District:
  *           type: string
- *         PostalCode:
+ *         Ward:
  *           type: string
  *         IsDefault:
  *           type: boolean
- *         createdAt:
- *           type: string
- *           format: date-time
- *         updatedAt:
- *           type: string
- *           format: date-time
  *     AddressCreate:
  *       type: object
  *       required:
- *         - FullName
+ *         - RecipientName
  *         - Phone
- *         - Street
- *         - City
- *         - Province
+ *         - AddressDetail
  *       properties:
- *         FullName:
+ *         RecipientName:
  *           type: string
  *           example: "Nguyen Van A"
  *         Phone:
  *           type: string
  *           example: "0912345678"
- *         Street:
+ *         AddressDetail:
  *           type: string
- *           example: "123 Le Loi"
- *         City:
- *           type: string
- *           example: "Ho Chi Minh"
+ *           example: "123 Le Loi, Phuong Ben Nghe"
  *         Province:
  *           type: string
- *           example: "HCM"
- *         Country:
+ *           example: "Ho Chi Minh"
+ *         District:
  *           type: string
- *           example: "Vietnam"
- *         PostalCode:
+ *           example: "District 1"
+ *         Ward:
  *           type: string
- *           example: "700000"
+ *           example: "Ward 6"
  *         IsDefault:
  *           type: boolean
  *           example: true
@@ -90,18 +77,14 @@ const { verifyToken } = require('../../utils/jwt');
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/AddressCreate'
- *           examples:
- *             addExample:
- *               summary: Create address example
- *               value:
- *                 FullName: "Nguyen Van A"
- *                 Phone: "0912345678"
- *                 Street: "123 Le Loi"
- *                 City: "Ho Chi Minh"
- *                 Province: "HCM"
- *                 Country: "Vietnam"
- *                 PostalCode: "700000"
- *                 IsDefault: true
+ *           example:
+ *             RecipientName: "Nguyen Van A"
+ *             Phone: "0912345678"
+ *             AddressDetail: "123 Le Loi, Phuong Ben Nghe"
+ *             Province: "Ho Chi Minh"
+ *             District: "District 1"
+ *             Ward: "Ward 6"
+ *             IsDefault: true
  *     responses:
  *       201:
  *         description: Address created
@@ -193,15 +176,14 @@ router.get('/:id', verifyToken, ctrl.getAddress);
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/AddressCreate'
- *           examples:
- *             updateExample:
- *               value:
- *                 FullName: "Nguyen Van B"
- *                 Phone: "0987654321"
- *                 Street: "456 Pasteur"
- *                 City: "Ho Chi Minh"
- *                 Province: "HCM"
- *                 IsDefault: false
+ *           example:
+ *             RecipientName: "Nguyen Van B"
+ *             Phone: "0987654321"
+ *             AddressDetail: "456 Pasteur, Phuong Ben Nghe"
+ *             Province: "Ho Chi Minh"
+ *             District: "District 1"
+ *             Ward: "Ward 6"
+ *             IsDefault: false
  *     responses:
  *       200:
  *         description: Updated address

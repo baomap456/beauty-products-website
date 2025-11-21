@@ -85,13 +85,17 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const cartCount = cartItems.reduce((total, item) => {
+        return total + (parseInt(item.Quantity) || 0);
+    }, 0);
+
     // Giá trị chia sẻ cho toàn bộ app
     const value = {
         cartItems,
         cartTotal,
         addToCart,
         fetchCart, // Để gọi lại khi cần (ví dụ sau khi xóa)
-        cartCount: cartItems.length // Số lượng loại sản phẩm (hoặc dùng reduce để tính tổng số item)
+        cartCount // Số lượng loại sản phẩm (hoặc dùng reduce để tính tổng số item)
     };
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

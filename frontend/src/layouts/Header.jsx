@@ -4,12 +4,14 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
 
 const Header = () => {
     const navigate = useNavigate();
     const [user, setUser] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [isAdmin, setIsAdmin] = React.useState(false);
+    const { cartCount } = useCart()
     React.useEffect(() => {
         const storedUser = localStorage.getItem('currentUser');
         const token = localStorage.getItem('token');
@@ -85,7 +87,7 @@ const Header = () => {
                         )}
                         {/* Giỏ hàng */}
                         <IconButton size="large" aria-label="show cart items" color="inherit" onClick={() => navigate('/cart')} sx={{ mr: 2 }}>
-                            <Badge color="error">
+                            <Badge badgeContent={cartCount} color="error">
                                 <ShoppingCartIcon />
                             </Badge>
                         </IconButton>
