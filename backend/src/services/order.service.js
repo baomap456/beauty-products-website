@@ -157,9 +157,9 @@ async function createOrderFromCart(userId, { cartId = null, addressId = null, di
             include: [
                 {
                     model: OrderDetail,
-                    as: 'orderDetails',
+                    as: 'OrderDetails',
                     required: false,
-                    include: [{ model: Product, as: 'product', required: false }]
+                    include: [{ model: Product, as: 'Product', required: false }]
                 }
             ],
             transaction: t
@@ -246,7 +246,7 @@ async function getOrderById(userId, orderId) {
             include: [
                 {
                     model: OrderDetail,
-                    as: 'orderDetails',
+                    as: 'OrderDetails',
                     required: false,
                     include: [{ model: Product, as: 'product', required: false }]
                 },
@@ -324,13 +324,13 @@ async function getOrderDetails(orderId) {
             include: [
                 {
                     model: OrderDetail,
-                    as: 'orderDetails',
+                    as: 'OrderDetails',
                     required: false,
-                    include: [{ model: Product, as: 'product', required: false }]
+                    include: [{ model: Product, as: 'Product', required: false }]
                 },
-                ...(Payment ? [{ model: Payment, as: 'payments', required: false }] : []),
-                ...(Address ? [{ model: Address, as: 'address', required: false }] : []),
-                ...(Discount ? [{ model: Discount, as: 'discount', required: false }] : [])
+                ...(Payment ? [{ model: Payment, as: 'Payments', required: false }] : []),
+                ...(Address ? [{ model: Address, as: 'Address', required: false }] : []),
+                ...(Discount ? [{ model: Discount, as: 'Discount', required: false }] : [])
             ]
         });
     } catch (err) {

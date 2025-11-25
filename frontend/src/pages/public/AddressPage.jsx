@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Container, Typography, Button, Grid, Card, CardContent, Chip, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AddressForm from '../../components/address/AddressForm';
@@ -6,6 +7,7 @@ import AddressList from '../../components/address/AddressList';
 import { createAddress, getAddresses } from '../../api/user/address';
 
 const AddressPage = () => {
+    const navigate = useNavigate();
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -68,6 +70,22 @@ const AddressPage = () => {
         }
     };
 
+    const handleContinueToOrder = () => {
+        if (!selectedAddressId) {
+            alert("Vui lòng chọn một địa chỉ nhận hàng!");
+            return;
+        }
+
+        // Tìm object địa chỉ đầy đủ dựa trên ID đang chọn
+        const selectedAddress = addresses.find(addr => addr.ID_Address === selectedAddressId);
+
+        // Chuyển hướng sang trang Order (CheckoutPage) 
+        // và gửi kèm thông tin địa chỉ qua "state"
+        navigate('/order', {
+            state: { shippingAddress: selectedAddress }
+        });
+    };
+
     const getDefaultAddressId = (list) => {
         const defaultAddr = list.find(addr => addr.IsDefault);
         // Nếu có mặc định thì lấy, không thì lấy cái đầu tiên, không có nữa thì null
@@ -107,7 +125,17 @@ const AddressPage = () => {
                     </Box>
 
                     {/* Nút Tiếp tục thanh toán (nếu đây là trang checkout) */}
-                    <Button variant="contained" fullWidth sx={{ mt: 3 }}>Tiếp tục thanh toán</Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        size="large"
+                        disabled={!selectedAddressId}
+                        onClick={handleContinueToOrder} // <-- Gọi hàm chuyển trang
+                        sx={{ mt: 3, py: 1.5, fontSize: '1.1rem', fontWeight: 'bold' }}
+                    >
+                        Tiếp tục thanh toán
+                    </Button>
                 </Box>
             )}
         </Container>

@@ -96,7 +96,7 @@ const { verifyToken } = require('../../utils/jwt');
  *       401:
  *         description: Unauthorized
  */
-router.post('/', verifyToken, ctrl.createPayment);
+router.post('/', ctrl.createPayment);
 
 /**
  * @openapi
@@ -128,6 +128,6 @@ router.post('/', verifyToken, ctrl.createPayment);
  *       401:
  *         description: Unauthorized
  */
-router.get('/order/:orderId', verifyToken, ctrl.getPaymentByOrderId);
+router.get('/order/:orderId', ctrl.getPaymentByOrderId);
 
 module.exports = router;

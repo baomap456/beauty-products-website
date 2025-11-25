@@ -222,6 +222,7 @@ async function mergeCarts(userId, localItems = []) {
                 const { Product_ID, Quantity } = localItem;
 
                 const product = await Product.findByPk(Product_ID, { transaction: t });
+                const productPrice = product.Price;
                 if (!product) continue;
 
                 let item = await CartItem.findOne({ where: { Cart_ID: cartIdVal, Product_ID }, transaction: t });
@@ -234,7 +235,8 @@ async function mergeCarts(userId, localItems = []) {
                     await CartItem.create({
                         Cart_ID: cartIdVal,
                         Product_ID,
-                        Quantity
+                        Quantity,
+                        Price: productPrice
                     }, { transaction: t });
                 }
             }

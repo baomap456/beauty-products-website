@@ -2,7 +2,6 @@ import React from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, Badge, Box, Container, Tooltip, Avatar, Menu, MenuItem } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 
@@ -13,17 +12,32 @@ const Header = () => {
     const [isAdmin, setIsAdmin] = React.useState(false);
     const { cartCount } = useCart()
     React.useEffect(() => {
-        const storedUser = localStorage.getItem('currentUser');
-        const token = localStorage.getItem('token');
-        const storedRole = localStorage.getItem('userRole');
-        if (token && storedUser) {
-            // Chuyển chuỗi JSON ngược lại thành Object
-            setUser(JSON.parse(storedUser));
-        }
+        const checkUserLoggedIn = () => {
+            const storedUser = localStorage.getItem('currentUser');
+            const token = localStorage.getItem('token');
+            const storedRole = localStorage.getItem('userRole');
 
-        if (storedRole === 'admin') {
-            setIsAdmin(true);
-        }
+            if (token && storedUser) {
+                try {
+                    setUser(JSON.parse(storedUser));
+                } catch (e) {
+                    console.error("Lỗi parse user:", e);
+                    setUser(null);
+                }
+            } else {
+                setUser(null); // Reset nếu không có token
+                setIsAdmin(false);
+            }
+
+            if (storedRole === 'admin') {
+                setIsAdmin(true);
+            }
+        };
+        checkUserLoggedIn();
+        window.addEventListener('storage', checkUserLoggedIn);
+        return () => {
+            window.removeEventListener('storage', checkUserLoggedIn);
+        };
     }, []);
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);

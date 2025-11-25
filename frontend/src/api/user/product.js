@@ -24,4 +24,4 @@ const getProductById = async (productId) => {
 
 
 
-export { getProducts, getProductById };
+export { getProducts, getProductById};

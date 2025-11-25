@@ -12,7 +12,7 @@ const { verifyToken } = require('../../utils/jwt');
 
 /**
  * @openapi
- * /api/user/orders/checkout:
+ * /api/user/orders:
  *   post:
  *     tags:
  *       - Orders (User)
@@ -38,7 +38,7 @@ const { verifyToken } = require('../../utils/jwt');
  *       201:
  *         description: Order created
  */
-router.post('/checkout', verifyToken, ctrl.checkout);
+router.post('/', ctrl.checkout);
 
 /**
  * @openapi
@@ -62,7 +62,7 @@ router.post('/checkout', verifyToken, ctrl.checkout);
  *       200:
  *         description: Paginated orders
  */
-router.get('/', verifyToken, ctrl.myOrders);
+router.get('/', ctrl.myOrders);
 
 /**
  * @openapi
@@ -83,6 +83,6 @@ router.get('/', verifyToken, ctrl.myOrders);
  *       200:
  *         description: Order detail
  */
-router.get('/:id', verifyToken, ctrl.getOrderByUser);
+router.get('/:id', ctrl.getOrderByUser);
 
 module.exports = router;

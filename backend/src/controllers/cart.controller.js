@@ -109,7 +109,7 @@ const mergeCart = async (req, res) => {
             return res.status(400).json({ message: 'items must be an array' });
         }
 
-        const cart = await cartService.mergeCart(userId, items);
+        const cart = await cartService.mergeCarts(userId, items);
         return res.json(cart);
     } catch (err) {
         return handleError(res, err, 'Error merging cart');

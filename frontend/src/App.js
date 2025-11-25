@@ -16,7 +16,9 @@ import ShopPage from './pages/public/ShopPage';
 import CartPage from './pages/public/CartPage';
 import AddressPage from './pages/public/AddressPage';
 import { CartProvider } from './contexts/CartContext';
-// import ProductDetail from './pages/public/ProductDetail';
+import OrderPage from './pages/public/OrderPage';
+import OrderSuccessPage from './pages/public/OrderSuccessPage';
+import ProductPageDetail from './pages/public/ProductPageDetail';
 
 function App() {
   return (
@@ -26,9 +28,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Protected wrapper */}
           <Route path="/dashboard" element={<ProtectedRoute />}>
-            {/* Admin layout inside protected area */}
             <Route element={<AdminLayout />}>
               <Route index element={<DashboardPage />} />
               <Route path="products" element={<ProductPage />} />
@@ -39,16 +39,15 @@ function App() {
 
           <Route path="/" element={<MainLayout />}>
 
-            {/* Trang chủ: localhost:3000/ */}
             <Route index element={<HomePage />} />
 
-            {/* Trang cửa hàng: localhost:3000/shop */}
             <Route path="shop" element={<ShopPage />} />
 
-            {/* Trang chi tiết: localhost:3000/product/123 */}
-            {/* <Route path="product/:id" element={<ProductDetail />} /> */}
+            <Route path="product/:id" element={<ProductPageDetail />} />
             <Route path="cart" element={<CartPage />} />
-            <Route path="/addresses" element={<AddressPage />} />
+            <Route path="addresses" element={<AddressPage />} />
+            <Route path="order" element={<OrderPage />} />
+            <Route path="order-success" element={<OrderSuccessPage />} />
           </Route>
 
         </Routes>

@@ -60,4 +60,14 @@ const deleteCart = async () => {
     }
 };
 
-export { createCart, getCart, addItem, updateCartItem, deleteCartItem, deleteCart };
+const mergeCarts = async (localCartItems) => {
+    try {
+        const response = await axios.post('/user/cart/merge', { items: localCartItems });
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+};
+
+export { createCart, getCart, addItem, updateCartItem, deleteCartItem, deleteCart, mergeCarts };

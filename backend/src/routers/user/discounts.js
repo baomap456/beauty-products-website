@@ -51,6 +51,6 @@ const ctrl = require('../../controllers/discount.controller');
  *       500:
  *         description: Lỗi server
  */
-router.post('/apply', verifyToken, ctrl.applyDiscount);
+router.post('/apply', ctrl.applyDiscount);
 
 module.exports = router;
