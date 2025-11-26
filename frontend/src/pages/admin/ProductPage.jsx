@@ -18,30 +18,35 @@ import {
 import { getBrands } from '../../api/admin/brand';
 import { getCategories } from '../../api/admin/category';
 import ActionButtons from '../../components/UI/ActionButtons';
+import ProductDetail from '../../components/product/ProductFormDetail';
 
 const ProductPage = () => {
-    //API 
+
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
 
-    // Dialog add/edit
+    
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState(null);
+    const [isViewOpen, setIsViewOpen] = useState(false);
+    const [productToView, setProductToView] = useState(null);
 
-    // Confirm delete
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
 
-    // Snackbar
+
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     const columns = [
         {
-            header: 'ID', // Tiêu đề cột
-            field: 'ID_Product' // Tên trường trong data
+            header: 'ID', 
+            field: 'ID_Product'
         },
         {
             header: 'Name_Product',
@@ -55,10 +60,8 @@ const ProductPage = () => {
             header: 'Stock',
             field: 'Stock'
         },
-        // --- Đây là phần "tùy chỉnh" ---
         {
             header: 'Category',
-            // Dùng "render" vì nó là object lồng nhau
             render: (row) => row.Category.Name_Category
         },
         {
@@ -67,11 +70,11 @@ const ProductPage = () => {
         },
         {
             header: 'Actions',
-            // Dùng "render" để hiển thị component
             render: (row) => (
                 <ActionButtons
                     onEdit={() => handleEdit(row)}
                     onDelete={() => handleDeleteRequest(row)}
+                    onView={() => handleView(row)}
                 />
             )
         }
@@ -101,8 +104,9 @@ const ProductPage = () => {
         if (!productToDelete) return;
         try {
             await deleteProduct(productToDelete.ID_Product);
-            const data = await getProducts();
-            setProducts(data);
+            
+            await refreshData(); 
+            
             openSnackbar('Deleted product successfully');
         } catch (err) {
             console.error(err);
@@ -112,6 +116,11 @@ const ProductPage = () => {
             setProductToDelete(null);
         }
     };
+
+    const handleView = (product) => {
+        setProductToView(product);
+        setIsViewOpen(true);
+    }
 
     const handleSubmitProduct = async (formdata) => {
         try {
@@ -133,8 +142,7 @@ const ProductPage = () => {
                 openSnackbar('Created product successfully');
             }
 
-            const data = await getProducts();
-            setProducts(data);
+            await refreshData();
             handleCloseDialog();
         } catch (err) {
             console.error(err);
@@ -142,55 +150,67 @@ const ProductPage = () => {
         }
     };
 
+    const refreshData = async () => {
+        try {
+            // Không set loading=true ở đây để tránh nháy trang khi update/delete
+            // Hoặc set tùy ý bạn
+            const params = {
+                page: page + 1, 
+                limit: rowsPerPage
+            };
+            const [productsResponse, brandsResponse, categoriesResponse] = await Promise.all([
+                getProducts(params),
+                getBrands(),
+                getCategories()
+            ]);
+
+            // Xử lý data (Array hoặc Object {items: []})
+            const productsData = productsResponse.items || productsResponse || [];
+            const brandsData = brandsResponse.items || brandsResponse || [];
+            const categoriesData = categoriesResponse.items || categoriesResponse || [];
+            const total = productsResponse.totalCount || 0;
+
+            // Logic Gộp dữ liệu (Merge)
+            const productsWithDetails = productsData.map(product => {
+                const category = categoriesData.find(c => c.ID_Category === product.Category_ID);
+                const brand = brandsData.find(b => b.ID_Brand === product.Brand_ID);
+                return {
+                    ...product,
+                    Category: category || { Name_Category: 'N/A' },
+                    Brand: brand || { Name_Brand: 'N/A' }
+                };
+            });
+
+            // Cập nhật State
+            setCategories(categoriesData);
+            setBrands(brandsData);
+            setProducts(productsWithDetails);
+            setTotalCount(total);
+
+        } catch (err) {
+            console.error("Error refreshing data:", err);
+            setError(err.message || 'Failed to load data');
+        }
+    };
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                // 1. Vẫn gọi cả 3 API
-                const [productsResponse, brandsResponse, categoriesResponse] = await Promise.all([
-                    getProducts(),
-                    getBrands(),
-                    getCategories()
-                ]);
-
-                // 2. Trích xuất mảng dữ liệu (Giả sử API trả về { items: [...] })
-                //    Nếu API của bạn trả về mảng trực tiếp, hãy xóa ".items"
-                const productsData = productsResponse.items || productsResponse;
-                const brandsData = brandsResponse.items || brandsResponse;
-                const categoriesData = categoriesResponse.items || categoriesResponse;
-
-                // 3. Gộp dữ liệu lại cho ProductList (để fix lỗi crash)
-                const productsWithDetails = productsData.map(product => {
-                    // Tìm category tương ứng
-                    const category = categoriesData.find(c => c.ID_Category === product.Category_ID);
-
-
-                    // Tìm brand tương ứng
-                    const brand = brandsData.find(b => b.ID_Brand === product.Brand_ID);
-
-                    // Trả về product mới với object lồng nhau
-                    return {
-                        ...product,
-                        Category: category || { Name_Category: 'N/A' }, // Gắn object category
-                        Brand: brand || { Name_Brand: 'N/A' }       // Gắn object brand
-                    };
-                });
-
-                console.log('Products with details:', productsWithDetails);
-
-                // 4. Set state với dữ liệu đã xử lý
-                setCategories(categoriesData); // Dùng cho dropdown
-                setBrands(brandsData);       // Dùng cho dropdown
-                setProducts(productsWithDetails); // Dùng cho bảng (đã gộp)
-
-            } catch (err) {
-                setError(err.message || 'Failed to load products');
-            } finally {
-                setLoading(false);
-            }
+        const initData = async () => {
+            setLoading(true);
+            await refreshData();
+            setLoading(false);
         };
-        fetchProducts();
-    }, []);
+        initData();
+    }, [page, rowsPerPage]);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset về trang đầu
+    };
+    
 
     return (
         <Box >
@@ -216,6 +236,11 @@ const ProductPage = () => {
                 <ReusableTable
                     data={products}
                     columns={columns}
+                    totalCount={totalCount}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             )}
 
@@ -231,6 +256,13 @@ const ProductPage = () => {
                         brands={brands}
                     />
                 </DialogContent>
+            </Dialog>
+
+            <Dialog open={isViewOpen} onClose={() => setIsViewOpen(false)} maxWidth="md" fullWidth>
+             <ProductDetail 
+                 product={productToView} 
+                 onClose={() => setIsViewOpen(false)} 
+             />
             </Dialog>
 
             {/* Confirm Delete Dialog */}

@@ -63,35 +63,23 @@ const ProductPageDetail = () => {
 
     return (
         <Box sx={{ bgcolor: '#fff', minHeight: '100vh', pb: 8 }}>
-            
-            {/* Spacer cho Header fixed (nếu có) */}
             <Box sx={{ height: { xs: 60, md: 80 } }} /> 
-
             <Container maxWidth="lg">
-                
-                {/* PHẦN TRÊN: ẢNH & THÔNG TIN */}
                 <Grid container spacing={4}>
-                    
-                    {/* Cột Trái: Gallery Ảnh */}
                     <Grid item xs={12} md={6}>
-                        {/* Chuẩn bị mảng ảnh: Ảnh chính + Ảnh phụ (nếu có) */}
+                        
                         <ProductGallery 
                             images={[product.mainImage, ...(product.ProductImages?.map(img => img.URL) || [])].filter(Boolean)} 
                         />
                     </Grid>
-
-                    {/* Cột Phải: Thông tin & Nút mua */}
                     <Grid item xs={12} md={6}>
                         <ProductInfo 
                             product={product} 
-                            onAddToCart={handleAddToCart} // Truyền hàm xuống
+                            onAddToCart={handleAddToCart} 
                         />
                     </Grid>
                 </Grid>
-
                 <Divider sx={{ my: 6 }} />
-
-                {/* PHẦN GIỮA: MÔ TẢ CHI TIẾT */}
                 <Grid container>
                     <Grid item xs={12} md={10} lg={8}>
                         <ProductTabs description={product.Description} />
@@ -99,8 +87,6 @@ const ProductPageDetail = () => {
                 </Grid>
 
                 <Divider sx={{ my: 6 }} />
-
-                {/* PHẦN DƯỚI: SẢN PHẨM LIÊN QUAN */}
                 <Box>
                     <RelatedProducts products={relatedProducts} />
                 </Box>

@@ -1,8 +1,8 @@
 import axios from "../axios";
 
-const getCategories = async () => {
+const getCategories = async (params) => {
     try {
-        const response = await axios.get('/admin/categories');
+        const response = await axios.get('/admin/categories', { params });
         return response.data;
     } catch (error) {
         throw error;

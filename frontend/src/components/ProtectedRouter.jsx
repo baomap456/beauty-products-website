@@ -9,7 +9,6 @@ const ProtectedRoute = () => {
         return <Navigate to="/login" replace />;
     }
     if (userRole !== 'admin') {
-        // Đã đăng nhập, nhưng không phải admin -> Đá về trang chủ
         return <Navigate to="/" replace />;
     }
     return <Outlet />;

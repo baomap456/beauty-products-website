@@ -7,7 +7,8 @@ const handleError = (res, error, message = 'Internal server error') => {
 
 const getAllCategories = async (req, res) => {
     try {
-        const categories = await categoryService.getAllCategories();
+        const { page, limit } = req.query;
+        const categories = await categoryService.getAllCategories(page, limit);
         res.json(categories);
     } catch (error) {
         handleError(res, error, 'Error fetching categories');

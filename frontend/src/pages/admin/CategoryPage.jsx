@@ -25,6 +25,9 @@ const CategoryPage = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [categoryToEdit, setCategoryToEdit] = useState(null);
 
+    const [page, setPage] = useState(0); // MUI page bắt đầu từ 0
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     // Confirm delete
@@ -117,9 +120,16 @@ const CategoryPage = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
+                const params = {
+                    page: page + 1, // Backend dùng page 1, MUI dùng page 0
+                    limit: rowsPerPage
+                };
                 setLoading(true);
-                const data = await getCategories();
-                setCategories(data);
+                const data = await getCategories(params);
+                const items = data.items || data || [];
+                const total = data.totalCount || 0;
+                setCategories(items);
+                setTotalCount(total);
             }
             catch (err) {
                 setError('Failed to fetch categories');
@@ -130,7 +140,16 @@ const CategoryPage = () => {
             }
         };
         fetchCategories();
-    }, []);
+    }, [page, rowsPerPage]);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     return (
         <Box>
@@ -153,6 +172,11 @@ const CategoryPage = () => {
                 <ReusableTable
                     data={categories}
                     columns={columns}
+                    totalCount={totalCount}     // Tổng số
+                    page={page}                 // Trang hiện tại
+                    rowsPerPage={rowsPerPage}   // Limit
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             )}
             <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>

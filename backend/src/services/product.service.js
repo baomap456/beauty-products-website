@@ -3,12 +3,14 @@ const { Op } = require('sequelize');
 const Product = db.Product;
 const Category = db.Category;
 const Brand = db.Brand;
+const ProductImage = db.ProductImage;
 
-async function getAllProducts({ page = 1, limit = 20, name, category_id, brand_id, minPrice, maxPrice }) {
+async function getAllProducts({ page, limit, name, category_id, brand_id, minPrice, maxPrice }) {
     try {
         // 1. Xử lý phân trang
-        const offset = (page - 1) * limit;
-        const limitNum = parseInt(limit);
+        const currentPage = parseInt(page) || 1;
+        const currentLimit = parseInt(limit) || 20;
+        const offset = (currentPage - 1) * currentLimit;
 
         // 2. Xây dựng câu lệnh WHERE (Lọc & Tìm kiếm gộp làm một)
         const whereClause = {};
@@ -40,17 +42,21 @@ async function getAllProducts({ page = 1, limit = 20, name, category_id, brand_i
             where: whereClause,
             include: [
                 { model: Category, as: 'Category' },
-                { model: Brand, as: 'Brand' }
+                { model: Brand, as: 'Brand' },
+                { model: ProductImage }
             ],
             offset: offset,
-            limit: limitNum,
-            order: [['createdAt', 'DESC']] // Sắp xếp mới nhất lên đầu (Tùy chọn)
+            limit: currentLimit,
+            distinct: true,
+            order: [['ID_Product', 'ASC']]
         });
 
         // 4. Trả về cấu trúc chuẩn cho Frontend
         return {
             totalCount: count, // Tổng số sản phẩm (để tính phân trang)
-            items: rows        // Danh sách sản phẩm trang hiện tại
+            items: rows,        // Danh sách sản phẩm trang hiện tại
+            page: currentPage,
+            limit: currentLimit
         };
 
     } catch (error) {

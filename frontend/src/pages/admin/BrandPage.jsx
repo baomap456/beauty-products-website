@@ -10,6 +10,9 @@ const BrandPage = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [page, setPage] = useState(0); // MUI page bắt đầu từ 0
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
 
     const openSnackbar = (message, severity = 'success') =>
         setSnackbar({ open: true, message, severity });
@@ -104,12 +107,28 @@ const BrandPage = () => {
         }
     };
 
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset về trang đầu khi thay đổi số dòng trên trang
+    };
+
     useEffect(() => {
         const fetchBrands = async () => {
             try {
+                const parmas = {
+                    page: page + 1, // Backend dùng page 1, MUI dùng page 0
+                    limit: rowsPerPage
+                };
                 setLoading(true);
-                const data = await getBrands();
-                setBrands(data);
+                const data = await getBrands(parmas);
+                const items = data.items || data || [];
+                const total = data.totalCount || 0;
+                setBrands(items);
+                setTotalCount(total);
             }
             catch (err) {
                 setError('Failed to fetch brands');
@@ -120,7 +139,7 @@ const BrandPage = () => {
             }
         };
         fetchBrands();
-    }, []);
+    }, [page, rowsPerPage]);
 
     return (
         <Box>
@@ -140,7 +159,15 @@ const BrandPage = () => {
                     <Alert severity="error">{error}</Alert>
                 </Box>
             ) : (
-                <ReusableTable data={brands} columns={columns} />
+                <ReusableTable
+                    data={brands}
+                    columns={columns}
+                    totalCount={totalCount}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
             )}
             <Dialog open={isFormOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
                 <DialogContent dividers>

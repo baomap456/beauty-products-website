@@ -7,7 +7,8 @@ const handleError = (res, error, message = 'Internal server error') => {
 
 const getAllBrands = async (req, res) => {
     try {
-        const brands = await brandService.getAllBrands();
+        const { page, limit } = req.query;
+        const brands = await brandService.getAllBrands(page, limit);
         res.json(brands);
     } catch (error) {
         handleError(res, error, 'Error fetching brands');

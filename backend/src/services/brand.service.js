@@ -1,11 +1,22 @@
 const db = require('../models');
 const Brand = db.Brand;
 
-async function getAllBrands() {
+async function getAllBrands(page, limit) {
     try {
-        const offset = 0;
-        const limit = 20;
-        return await Brand.findAll({ offset, limit });
+        const currentPage = parseInt(page) || 1;
+        const currentLimit = parseInt(limit) || 20;
+        const offset = (currentPage - 1) * currentLimit;
+        const { count, rows } = await Brand.findAndCountAll({
+            offset: offset,
+            limit: currentLimit,
+            order: [['ID_Brand', 'ASC']]
+        });
+        return {
+            totalCount: count,
+            items: rows,
+            page: currentPage,
+            limit: currentLimit
+        };
     } catch (error) {
         console.error('Error in getAllBrands service:', error);
         throw error;

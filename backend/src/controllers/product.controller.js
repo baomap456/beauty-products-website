@@ -13,31 +13,24 @@ function validateRequired(body) {
 
 const getAllProducts = async (req, res) => {
     try {
-        // 1. Lấy tất cả tham số từ URL
         const {
             page,
             limit,
-            name,       // Frontend gửi 'name'
-            category_id,// Frontend gửi 'category_id'
-            brand_id,   // Frontend gửi 'brand_id'
-            minPrice,
+            name,
+            category_id,
+            brand_id,
             maxPrice
         } = req.query;
 
-        // 2. Gọi Service với object filters
         const result = await productService.getAllProducts({
             page,
             limit,
             name,
             category_id,
             brand_id,
-            minPrice,
             maxPrice
         });
-
-        // 3. Trả về kết quả (gồm items và totalCount)
         res.json(result);
-
     } catch (error) {
         handleError(res, error, 'Error fetching products');
     }
@@ -79,7 +72,7 @@ const updateProduct = async (req, res) => {
         // fix: declare productData before validating it
         const productId = req.params.id;
         const productData = req.body;
-        if (!productData.name || !productData.price) {
+        if (!productData.Name_Product || !productData.Price) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
         const updatedProduct = await productService.updateProduct(productId, productData);

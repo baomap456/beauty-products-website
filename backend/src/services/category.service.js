@@ -1,11 +1,22 @@
 const db = require('../models');
 const Category = db.Category;
 
-async function getAllCategories() {
+async function getAllCategories(page, limit) {
     try {
-        const offset = 0;
-        const limit = 20;
-        return await Category.findAll({ offset, limit });
+        const currentPage = parseInt(page) || 1;
+        const currentLimit = parseInt(limit) || 20;
+        const offset = (currentPage - 1) * currentLimit;
+        const { count, rows } = await Category.findAndCountAll({
+            offset: offset,
+            limit: currentLimit,
+            order: [['ID_Category', 'ASC']]
+        });
+        return {
+            totalCount: count,
+            items: rows,
+            page: currentPage,
+            limit: currentLimit
+        };
     } catch (error) {
         console.error('Error in getAllCategories service:', error);
         throw error;

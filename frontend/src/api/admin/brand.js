@@ -1,8 +1,9 @@
 import axios from "../axios";
 
-const getBrands = async () => {
+const getBrands = async (params) => {
     try {
-        const response = await axios.get('/admin/brands');
+
+        const response = await axios.get('/admin/brands', { params });
         return response.data;
     } catch (error) {
         throw error;
